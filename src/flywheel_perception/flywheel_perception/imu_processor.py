@@ -4,8 +4,24 @@ import json
 import math
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from rcl_interfaces.msg import ParameterDescriptor
 from sensor_msgs.msg import Imu
 from std_msgs.msg import String
+
+SENSOR_QOS = QoSProfile(
+    reliability=ReliabilityPolicy.BEST_EFFORT,
+    history=HistoryPolicy.KEEP_LAST,
+    depth=1,
+    durability=DurabilityPolicy.VOLATILE,
+)
+
+PROCESSED_QOS = QoSProfile(
+    reliability=ReliabilityPolicy.RELIABLE,
+    history=HistoryPolicy.KEEP_LAST,
+    depth=1,
+    durability=DurabilityPolicy.VOLATILE,
+)
 
 
 def quaternion_to_euler(x, y, z, w):
@@ -33,14 +49,25 @@ def quaternion_to_euler(x, y, z, w):
 class ImuProcessor(Node):
     def __init__(self):
         super().__init__('imu_processor')
-        self.sub = self.create_subscription(Imu, '/imu', self.imu_cb, 10)
-        self.pub = self.create_publisher(String, '/perception/imu_summary', 10)
+
+        self.declare_parameter(
+            'stuck_threshold', 0.05,
+            ParameterDescriptor(description='Average motion below this value triggers stuck detection'),
+        )
+        self.declare_parameter(
+            'stuck_window', 50,
+            ParameterDescriptor(description='Number of samples in the stuck-detection sliding window'),
+        )
+        self.stuck_threshold = self.get_parameter('stuck_threshold').value
+        self.max_history = self.get_parameter('stuck_window').value
+
+        self.sub = self.create_subscription(Imu, '/imu', self.imu_cb, SENSOR_QOS)
+        self.pub = self.create_publisher(String, '/perception/imu_summary', PROCESSED_QOS)
 
         # Stuck detection: track angular velocity history
         self.velocity_history = []
-        self.max_history = 50  # ~0.5 seconds at 100Hz
 
-        self.get_logger().info('IMU processor started')
+        self.get_logger().info('IMU processor started (explicit QoS)')
 
     def imu_cb(self, msg: Imu):
         q = msg.orientation
@@ -59,7 +86,7 @@ class ImuProcessor(Node):
 
         # Stuck if average motion is very low for the full window
         avg_motion = sum(self.velocity_history) / len(self.velocity_history) if self.velocity_history else 0
-        stuck = len(self.velocity_history) >= self.max_history and avg_motion < 0.05
+        stuck = len(self.velocity_history) >= self.max_history and avg_motion < self.stuck_threshold
 
         summary = {
             'heading_deg': round(yaw, 2),

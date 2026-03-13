@@ -6,7 +6,8 @@ import os
 
 import pytest
 
-from flywheel_orchestrator.evaluator import evaluate_mission, GOALS
+from flywheel_orchestrator.evaluator import evaluate_mission
+from flywheel_common.constants import GOALS
 
 
 class FakeMissionResult:

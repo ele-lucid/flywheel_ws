@@ -3,7 +3,11 @@
 import os
 import json
 import time
+import logging
 from openai import OpenAI
+import openai
+
+logger = logging.getLogger(__name__)
 
 
 class LLMClient:
@@ -20,25 +24,43 @@ class LLMClient:
         """Single-turn chat completion. Returns the response text."""
         self.call_count += 1
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                )
+                break
+            except (openai.APITimeoutError, openai.RateLimitError, openai.APIConnectionError) as e:
+                delay = 2 ** attempt  # 1s, 2s, 4s
+                logger.warning("LLM API error (attempt %d/%d): %s. Retrying in %ds...",
+                               attempt + 1, max_retries, e, delay)
+                if attempt == max_retries - 1:
+                    logger.error("LLM API call failed after %d retries: %s", max_retries, e)
+                    return None
+                time.sleep(delay)
 
         usage = response.usage
         if usage:
             self.total_tokens += usage.total_tokens
+
+        if not response.choices:
+            logger.warning("LLM returned empty choices for model %s", self.model)
+            return None
 
         return response.choices[0].message.content
 
     def chat_json(self, system_prompt, user_prompt, temperature=0.4, max_tokens=4096):
         """Chat completion that returns parsed JSON. Retries once on parse failure."""
         text = self.chat(system_prompt, user_prompt, temperature, max_tokens)
+        if text is None:
+            return {}
 
         # Strip markdown code fences if present
         text = text.strip()
@@ -58,15 +80,23 @@ class LLMClient:
                 f"Original request:\n{user_prompt}"
             )
             text = self.chat(system_prompt, retry_prompt, temperature=0.2, max_tokens=max_tokens)
+            if text is None:
+                return {}
             text = text.strip()
             if text.startswith('```'):
                 lines = text.split('\n')
                 lines = [l for l in lines if not l.strip().startswith('```')]
                 text = '\n'.join(lines)
-            return json.loads(text)
+            try:
+                return json.loads(text)
+            except json.JSONDecodeError:
+                logger.error("chat_json failed to parse JSON after retry: %s", text[:200])
+                return {}
 
     def extract_code(self, text):
         """Extract Python code from LLM response (handles markdown fences)."""
+        if text is None:
+            return None
         text = text.strip()
 
         # Look for python code block

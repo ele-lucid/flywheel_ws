@@ -7,13 +7,15 @@ It only modifies mission nodes in flywheel_missions/generated/.
 import json
 import os
 import signal
+import statistics
 import subprocess
 import sys
 import time
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
+from std_msgs.msg import String, Empty
 
 from .llm_client import LLMClient
 from .code_writer import CodeWriter
@@ -79,31 +81,57 @@ class Orchestrator(Node):
         self.max_llm_calls = int(os.environ.get('MAX_LLM_CALLS_PER_CYCLE', '20'))
         self.failure_threshold = int(os.environ.get('FAILURE_RESET_THRESHOLD', '3'))
 
+        # QoS profiles
+        world_qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
+        status_qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10
+        )
+        reset_qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10
+        )
+
         # World model subscriber
         self._world_state = None
         self._world_state_time = 0
         self.world_sub = self.create_subscription(
-            String, '/perception/world_model', self._world_cb, 10)
+            String, '/perception/world_model', self._world_cb, world_qos)
 
         # Mission status subscriber
         self._mission_status = None
         self.status_sub = self.create_subscription(
-            String, '/mission/status', self._status_cb, 10)
+            String, '/mission/status', self._status_cb, status_qos)
+
+        # Reset publisher (to reset goals_visited in world_model)
+        self.reset_pub = self.create_publisher(Empty, '/flywheel/reset', reset_qos)
 
         # Determine starting cycle
         self.cycle = self._find_last_cycle() + 1
-        self.consecutive_failures = 0
+        self._recent_scores = []  # Rolling window for failure detection
 
         self.get_logger().info(f'Flywheel orchestrator initialized. Starting at cycle {self.cycle}')
         self.get_logger().info(f'Workspace: {self.ws_path}')
         self.get_logger().info(f'LLM: {self.llm.model} @ {self.llm.base_url}')
 
     def _world_cb(self, msg):
-        self._world_state = json.loads(msg.data)
-        self._world_state_time = time.time()
+        try:
+            self._world_state = json.loads(msg.data)
+            self._world_state_time = time.time()
+        except json.JSONDecodeError as e:
+            self.get_logger().error(f'Failed to parse world model JSON: {e}')
 
     def _status_cb(self, msg):
-        self._mission_status = json.loads(msg.data)
+        try:
+            self._mission_status = json.loads(msg.data)
+        except json.JSONDecodeError as e:
+            self.get_logger().error(f'Failed to parse mission status JSON: {e}')
 
     def _find_last_cycle(self):
         """Find the highest cycle number in logs/."""
@@ -128,6 +156,99 @@ class Orchestrator(Node):
                 return self._world_state
         self.get_logger().warn('Timed out waiting for world model')
         return None
+
+    def _spin_aware_execute(self, module_name, log_dir):
+        """Run mission subprocess with polling loop so callbacks keep firing."""
+        from .mission_runner import MissionResult
+        result = MissionResult()
+        runner = self.mission_runner
+        workspace = runner.workspace_path
+        timeout = runner.timeout
+
+        cmd = [
+            sys.executable, '-c',
+            f"""
+import sys
+sys.path.insert(0, '{os.path.join(workspace, "src", "flywheel_missions")}')
+import rclpy
+import importlib
+rclpy.init()
+mod = importlib.import_module('flywheel_missions.generated.{module_name}')
+cls = None
+for name in dir(mod):
+    obj = getattr(mod, name)
+    if isinstance(obj, type) and hasattr(obj, 'execute') and name != 'BaseMission':
+        cls = obj
+        break
+if cls is None:
+    print('ERROR: No mission class found', file=sys.stderr)
+    sys.exit(1)
+node = cls()
+try:
+    rclpy.spin(node)
+except KeyboardInterrupt:
+    pass
+finally:
+    node.destroy_node()
+    rclpy.shutdown()
+"""
+        ]
+
+        env = os.environ.copy()
+        pythonpath = os.path.join(workspace, 'src', 'flywheel_missions')
+        if 'PYTHONPATH' in env:
+            env['PYTHONPATH'] = pythonpath + ':' + env['PYTHONPATH']
+        else:
+            env['PYTHONPATH'] = pythonpath
+
+        start_time = time.time()
+
+        try:
+            proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=env,
+                preexec_fn=os.setsid,
+            )
+
+            # Poll instead of blocking on communicate()
+            while proc.poll() is None:
+                rclpy.spin_once(self, timeout_sec=0.1)
+                if time.time() - start_time > timeout:
+                    os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                    time.sleep(2)
+                    try:
+                        os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                    result.timed_out = True
+                    break
+
+            stdout, stderr = proc.communicate(timeout=5)
+            result.exit_code = proc.returncode
+            result.stdout = stdout.decode('utf-8', errors='replace')
+            result.stderr = stderr.decode('utf-8', errors='replace')
+
+        except Exception as e:
+            result.exit_code = -1
+            result.stderr = str(e)
+            result.crashed = True
+
+        result.duration = time.time() - start_time
+
+        if result.exit_code != 0 and not result.timed_out:
+            result.crashed = True
+
+        # Save logs
+        if log_dir:
+            os.makedirs(log_dir, exist_ok=True)
+            with open(os.path.join(log_dir, 'mission_stdout.txt'), 'w') as f:
+                f.write(result.stdout)
+            with open(os.path.join(log_dir, 'mission_stderr.txt'), 'w') as f:
+                f.write(result.stderr)
+
+        return result
 
     def run_flywheel(self):
         """The main loop. Runs forever."""
@@ -159,6 +280,10 @@ class Orchestrator(Node):
 
         # Reset LLM call counter
         self.llm.call_count = 0
+
+        # Publish reset to clear goals_visited in world_model before perceiving
+        self.reset_pub.publish(Empty())
+        self.get_logger().info('Published reset to /flywheel/reset')
 
         # ============================================
         # PHASE 1: PERCEIVE
@@ -208,6 +333,12 @@ class Orchestrator(Node):
             temperature=0.7
         )
 
+        # Null propagation safety: skip cycle if LLM returned None
+        if mission_plan is None:
+            self.get_logger().warn('LLM returned None for mission plan. Skipping cycle.')
+            self.cycle += 1
+            return
+
         with open(os.path.join(log_dir, 'mission_plan.txt'), 'w') as f:
             f.write(mission_plan)
         self.get_logger().info(f'  Plan: {mission_plan[:200]}...')
@@ -221,13 +352,19 @@ class Orchestrator(Node):
         code, validation = self.code_writer.generate_and_validate(
             world_state_str, mission_plan, best_code, current_lessons)
 
+        # Null propagation safety: skip cycle if code generation returned None
+        if code is None:
+            self.get_logger().warn('Code generation returned None. Skipping cycle.')
+            self.cycle += 1
+            return
+
         if not validation.ok:
             self.get_logger().error(f'Code validation failed after retries: {validation.errors}')
             with open(os.path.join(log_dir, 'failed_code.py'), 'w') as f:
                 f.write(code)
             with open(os.path.join(log_dir, 'validation_errors.json'), 'w') as f:
                 json.dump(validation.errors, f, indent=2)
-            self.consecutive_failures += 1
+            self._record_score(0)
             self.cycle += 1
             return
 
@@ -239,8 +376,8 @@ class Orchestrator(Node):
         self.get_logger().info(f'  Saved: {module_name} ({len(code)} bytes)')
         self.get_logger().info(f'  Running mission (timeout={self.mission_runner.timeout}s)...')
 
-        # Execute
-        mission_result = self.mission_runner.run_mission(module_name, log_dir=log_dir)
+        # Execute with spin-aware polling
+        mission_result = self._spin_aware_execute(module_name, log_dir=log_dir)
 
         self.get_logger().info(f'  Duration: {mission_result.duration:.1f}s')
         self.get_logger().info(f'  Exit code: {mission_result.exit_code}')
@@ -268,6 +405,17 @@ class Orchestrator(Node):
                 code, evaluation, sensor_log,
                 mission_result.stdout, mission_result.stderr)
 
+            # Null propagation safety: use safe default if analysis is None
+            if analysis is None:
+                self.get_logger().warn('Log analysis returned None. Using safe defaults.')
+                analysis = {
+                    'failure_modes': [],
+                    'success_factors': [],
+                    'root_causes': [],
+                    'lessons': [],
+                    'next_strategy': 'Retry previous approach',
+                }
+
             with open(os.path.join(log_dir, 'analysis.json'), 'w') as f:
                 json.dump(analysis, f, indent=2)
 
@@ -282,36 +430,28 @@ class Orchestrator(Node):
         # Update code history
         self.code_history.add(cycle, evaluation['total_score'], code_path)
 
+        # Track score in rolling window and check for bad streak
+        score = evaluation['total_score']
+        self._record_score(score)
+
         # Check if new best
-        if evaluation['total_score'] > best_score:
+        if score > best_score:
             best_path = os.path.join(self.memory_path, 'best_mission.py')
             with open(best_path, 'w') as f:
                 f.write(code)
-            self.get_logger().info(f'  NEW BEST! {evaluation["total_score"]} > {best_score}')
-            self.consecutive_failures = 0
-        elif evaluation['total_score'] < 10:
-            self.consecutive_failures += 1
-        else:
-            self.consecutive_failures = 0
-
-        # Check for bad streak - reset if needed
-        if self.consecutive_failures >= self.failure_threshold:
-            self.get_logger().warn(
-                f'  {self.consecutive_failures} consecutive failures. '
-                f'Clearing recent lessons and resetting to best code.')
-            self.lessons.clear_recent(n=self.consecutive_failures * 2)
-            self.consecutive_failures = 0
+            self.get_logger().info(f'  NEW BEST! {score} > {best_score}')
 
         # Cycle summary
         self.get_logger().info(f'\nCYCLE {cycle} COMPLETE')
-        self.get_logger().info(f'  Score: {evaluation["total_score"]}/100 (best: {max(best_score, evaluation["total_score"])})')
+        self.get_logger().info(f'  Score: {score}/100 (best: {max(best_score, score)})')
         self.get_logger().info(f'  LLM calls: {self.llm.call_count}, tokens: {self.llm.total_tokens}')
+        self.get_logger().info(f'  Recent scores: {self._recent_scores}')
 
         # Save conversation log
         with open(os.path.join(log_dir, 'cycle_summary.json'), 'w') as f:
             json.dump({
                 'cycle': cycle,
-                'score': evaluation['total_score'],
+                'score': score,
                 'llm_calls': self.llm.call_count,
                 'llm_tokens': self.llm.total_tokens,
                 'mission_plan': mission_plan,
@@ -323,6 +463,24 @@ class Orchestrator(Node):
         # Brief pause before next cycle
         self.get_logger().info('Pausing 5s before next cycle...')
         time.sleep(5)
+
+    def _record_score(self, score):
+        """Add score to rolling window and trigger lesson reset if median is too low."""
+        self._recent_scores.append(score)
+        # Keep only the last 5 scores
+        if len(self._recent_scores) > 5:
+            self._recent_scores = self._recent_scores[-5:]
+
+        # Only evaluate once we have a full window
+        if len(self._recent_scores) >= 5:
+            median_score = statistics.median(self._recent_scores)
+            if median_score < 20:
+                self.get_logger().warn(
+                    f'Rolling median score {median_score:.1f} is below threshold (20). '
+                    f'Recent scores: {self._recent_scores}. '
+                    f'Clearing recent lessons and resetting to best code.')
+                self.lessons.clear_recent(n=10)
+                self._recent_scores.clear()
 
     def _build_reason_prompt(self, world_state, lessons, last_eval, best_score):
         parts = []

@@ -5,16 +5,39 @@ import struct
 import numpy as np
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from rcl_interfaces.msg import ParameterDescriptor
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
+
+SENSOR_QOS = QoSProfile(
+    reliability=ReliabilityPolicy.BEST_EFFORT,
+    history=HistoryPolicy.KEEP_LAST,
+    depth=1,
+    durability=DurabilityPolicy.VOLATILE,
+)
+
+PROCESSED_QOS = QoSProfile(
+    reliability=ReliabilityPolicy.RELIABLE,
+    history=HistoryPolicy.KEEP_LAST,
+    depth=1,
+    durability=DurabilityPolicy.VOLATILE,
+)
 
 
 class DepthProcessor(Node):
     def __init__(self):
         super().__init__('depth_processor')
-        self.sub = self.create_subscription(Image, '/depth_camera/image_raw', self.depth_cb, 10)
-        self.pub = self.create_publisher(String, '/perception/depth_summary', 10)
-        self.get_logger().info('Depth processor started')
+
+        self.declare_parameter(
+            'obstacle_threshold', 1.0,
+            ParameterDescriptor(description='Distance in meters below which a pixel counts as an obstacle'),
+        )
+        self.obstacle_threshold = self.get_parameter('obstacle_threshold').value
+
+        self.sub = self.create_subscription(Image, '/depth_camera/image_raw', self.depth_cb, SENSOR_QOS)
+        self.pub = self.create_publisher(String, '/perception/depth_summary', PROCESSED_QOS)
+        self.get_logger().info('Depth processor started (explicit QoS)')
 
     def depth_cb(self, msg: Image):
         # Convert raw bytes to numpy array
@@ -32,8 +55,8 @@ class DepthProcessor(Node):
         if len(valid) == 0:
             summary = {'closest': 99.0, 'mean': 99.0, 'obstacle_fraction': 0.0}
         else:
-            # What fraction of the image has something closer than 1m
-            close_mask = valid < 1.0
+            # What fraction of the image has something closer than the threshold
+            close_mask = valid < self.obstacle_threshold
             summary = {
                 'closest': round(float(np.min(valid)), 3),
                 'mean': round(float(np.mean(valid)), 3),

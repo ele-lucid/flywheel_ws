@@ -17,15 +17,19 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
+from flywheel_common.constants import (
+    ROBOT_WIDTH, COLLISION_WARN_DIST, COLLISION_STOP_DIST,
+    MAX_LINEAR_VEL, MAX_ANGULAR_VEL,
+)
 
 
 class BaseMission(Node):
     """Base class for flywheel missions. Override execute() to define behavior."""
 
     # Constants available to generated code
-    ROBOT_WIDTH = 0.34
-    COLLISION_WARN_DIST = 0.3
-    COLLISION_STOP_DIST = 0.2
+    ROBOT_WIDTH = ROBOT_WIDTH
+    COLLISION_WARN_DIST = COLLISION_WARN_DIST
+    COLLISION_STOP_DIST = COLLISION_STOP_DIST
 
     def __init__(self, node_name='mission_node'):
         super().__init__(node_name)
@@ -100,24 +104,24 @@ class BaseMission(Node):
         return self._world_state
 
     def move_forward(self, speed=0.3):
-        """Move forward at given speed (m/s). Capped at 0.5 m/s."""
-        speed = max(0.0, min(speed, 0.5))
+        """Move forward at given speed (m/s). Capped at MAX_LINEAR_VEL."""
+        speed = max(0.0, min(speed, MAX_LINEAR_VEL))
         twist = Twist()
         twist.linear.x = speed
         self.cmd_vel_pub.publish(twist)
 
     def move(self, linear=0.0, angular=0.0):
         """Move with given linear (m/s) and angular (rad/s) velocities."""
-        linear = max(-0.5, min(linear, 0.5))
-        angular = max(-1.0, min(angular, 1.0))
+        linear = max(-MAX_LINEAR_VEL, min(linear, MAX_LINEAR_VEL))
+        angular = max(-MAX_ANGULAR_VEL, min(angular, MAX_ANGULAR_VEL))
         twist = Twist()
         twist.linear.x = linear
         twist.angular.z = angular
         self.cmd_vel_pub.publish(twist)
 
     def turn(self, angular_vel=0.3):
-        """Turn in place. Positive = left, negative = right. Capped at 1.0 rad/s."""
-        angular_vel = max(-1.0, min(angular_vel, 1.0))
+        """Turn in place. Positive = left, negative = right. Capped at MAX_ANGULAR_VEL."""
+        angular_vel = max(-MAX_ANGULAR_VEL, min(angular_vel, MAX_ANGULAR_VEL))
         twist = Twist()
         twist.angular.z = angular_vel
         self.cmd_vel_pub.publish(twist)

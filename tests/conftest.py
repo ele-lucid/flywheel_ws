@@ -12,6 +12,7 @@ SRC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src')
 sys.path.insert(0, os.path.join(SRC_DIR, 'flywheel_orchestrator'))
 sys.path.insert(0, os.path.join(SRC_DIR, 'flywheel_missions'))
 sys.path.insert(0, os.path.join(SRC_DIR, 'flywheel_perception'))
+sys.path.insert(0, os.path.join(SRC_DIR, 'flywheel_common'))
 
 
 @pytest.fixture

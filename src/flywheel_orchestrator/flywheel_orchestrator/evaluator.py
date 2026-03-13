@@ -4,15 +4,7 @@ import json
 import math
 import os
 
-
-# Goal positions (must match world_model.py)
-GOALS = [
-    {'id': 0, 'x': 5.0, 'y': 5.0},
-    {'id': 1, 'x': -5.0, 'y': -5.0},
-    {'id': 2, 'x': 7.0, 'y': -7.0},
-    {'id': 3, 'x': -8.0, 'y': 7.0},
-    {'id': 4, 'x': 0.0, 'y': -3.0},
-]
+from flywheel_common.constants import GOALS, ARENA_CELLS
 
 # Scoring weights
 W_GOALS = 0.40
@@ -87,9 +79,7 @@ def evaluate_mission(mission_result, sensor_log_path=None):
     visited_cells = set()
     for x, y in trail:
         visited_cells.add((int(x), int(y)))
-    # Arena is 20x20 = 400 cells, but ~350 reachable
-    reachable = 350
-    coverage_score = min(100, (len(visited_cells) / reachable) * 100)
+    coverage_score = min(100, (len(visited_cells) / ARENA_CELLS) * 100)
 
     # 5. Completion (10%)
     if mission_result.timed_out:

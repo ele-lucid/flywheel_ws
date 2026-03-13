@@ -4,9 +4,24 @@ import math
 import json
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from rcl_interfaces.msg import ParameterDescriptor
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import String
 
+SENSOR_QOS = QoSProfile(
+    reliability=ReliabilityPolicy.BEST_EFFORT,
+    history=HistoryPolicy.KEEP_LAST,
+    depth=1,
+    durability=DurabilityPolicy.VOLATILE,
+)
+
+PROCESSED_QOS = QoSProfile(
+    reliability=ReliabilityPolicy.RELIABLE,
+    history=HistoryPolicy.KEEP_LAST,
+    depth=1,
+    durability=DurabilityPolicy.VOLATILE,
+)
 
 SECTORS = ['front', 'front_left', 'left', 'back_left', 'back', 'back_right', 'right', 'front_right']
 # Each sector covers 45 degrees (pi/4 radians)
@@ -26,9 +41,15 @@ SECTOR_RANGES_DEG = [
 class LidarProcessor(Node):
     def __init__(self):
         super().__init__('lidar_processor')
-        self.sub = self.create_subscription(LaserScan, '/scan', self.scan_cb, 10)
-        self.pub = self.create_publisher(String, '/perception/lidar_summary', 10)
-        self.get_logger().info('Lidar processor started')
+
+        self.declare_parameter(
+            'sector_count', 8,
+            ParameterDescriptor(description='Number of angular sectors to divide the scan into'),
+        )
+
+        self.sub = self.create_subscription(LaserScan, '/scan', self.scan_cb, SENSOR_QOS)
+        self.pub = self.create_publisher(String, '/perception/lidar_summary', PROCESSED_QOS)
+        self.get_logger().info('Lidar processor started (explicit QoS)')
 
     def scan_cb(self, msg: LaserScan):
         n = len(msg.ranges)

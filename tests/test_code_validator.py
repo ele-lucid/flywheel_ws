@@ -147,6 +147,85 @@ class MyMission(BaseMission):
         assert any('execute()' in e for e in result.errors)
 
 
+class TestDunderAttrAccess:
+    def test_subclasses_access_banned(self):
+        code = GOOD_CODE.replace('self.move_forward(0.3)', 'x = "".__class__.__subclasses__()')
+        result = validate_mission_code(code)
+        assert not result.ok
+        assert any('Banned attribute access' in e for e in result.errors)
+
+    def test_import_dunder_banned(self):
+        code = GOOD_CODE.replace('self.move_forward(0.3)', 'x = builtins.__import__("os")')
+        result = validate_mission_code(code)
+        assert not result.ok
+
+
+class TestExpandedBannedCalls:
+    def test_getattr_banned(self):
+        code = GOOD_CODE.replace('self.move_forward(0.3)', 'getattr(self, "stop")()')
+        result = validate_mission_code(code)
+        assert not result.ok
+
+    def test_globals_banned(self):
+        code = GOOD_CODE.replace('self.move_forward(0.3)', 'g = globals()')
+        result = validate_mission_code(code)
+        assert not result.ok
+
+    def test_breakpoint_banned(self):
+        code = GOOD_CODE.replace('self.move_forward(0.3)', 'breakpoint()')
+        result = validate_mission_code(code)
+        assert not result.ok
+
+
+class TestWarnings:
+    def test_while_true_no_break_warns(self):
+        code = GOOD_CODE.replace(
+            'self.move_forward(0.3)',
+            'while True:\n            self.move_forward(0.1)'
+        )
+        result = validate_mission_code(code)
+        assert len(result.warnings) > 0
+        assert any('infinite loop' in w for w in result.warnings)
+        # Warnings don't fail validation
+        assert result.ok
+
+    def test_while_true_with_break_no_warn(self):
+        code = GOOD_CODE.replace(
+            'self.move_forward(0.3)',
+            'while True:\n            if True:\n                break'
+        )
+        result = validate_mission_code(code)
+        assert not any('infinite loop' in w for w in result.warnings)
+
+    def test_recursion_warns(self):
+        code = '''
+from flywheel_missions.base_mission import BaseMission
+
+class MyMission(BaseMission):
+    def execute(self):
+        self.helper()
+
+    def helper(self):
+        self.helper()
+'''
+        result = validate_mission_code(code)
+        assert any('Recursive' in w for w in result.warnings)
+
+
+class TestClassNameValidation:
+    def test_builtin_name_rejected(self):
+        code = GOOD_CODE.replace('class MyMission', 'class int')
+        result = validate_mission_code(code)
+        assert not result.ok
+        assert any('shadows' in e for e in result.errors)
+
+    def test_module_name_rejected(self):
+        code = GOOD_CODE.replace('class MyMission', 'class math')
+        result = validate_mission_code(code)
+        assert not result.ok
+        assert any('shadows' in e for e in result.errors)
+
+
 class TestEdgeCases:
     def test_syntax_error(self):
         result = validate_mission_code('def foo(:\n  pass')

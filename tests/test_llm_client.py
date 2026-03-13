@@ -79,17 +79,10 @@ class TestExtractCode:
         assert client.extract_code(text) == "print('hello')"
 
     def test_none_input_returns_none(self):
-        """After plan changes, extract_code should handle None gracefully."""
+        """extract_code handles None gracefully after Phase 0 fix."""
         client = LLMClient.__new__(LLMClient)
-        # Current code will crash on None.strip() -- this test documents the bug
-        # After Phase 0 fix, this should return None
-        try:
-            result = client.extract_code(None)
-            # If it doesn't crash, it should return None
-            assert result is None
-        except AttributeError:
-            # Expected with current code -- documents the bug
-            pytest.skip("Known bug: extract_code(None) crashes. Fixed in Phase 0.")
+        result = client.extract_code(None)
+        assert result is None
 
     def test_multiple_fences_takes_first(self):
         client = LLMClient.__new__(LLMClient)
@@ -126,17 +119,41 @@ class TestChatJson:
         assert result == {"fixed": True}
         assert client.call_count == 2
 
-    def test_double_json_failure_raises(self, mock_openai):
-        # Both attempts return invalid JSON
+    def test_double_json_failure_returns_empty(self, mock_openai):
+        # Both attempts return invalid JSON -- returns {} after Phase 0 fix
         mock_openai.chat.completions.create.side_effect = [
             make_response("nope"),
             make_response("still nope"),
         ]
         client = LLMClient(api_key="test-key")
-        # Current code raises JSONDecodeError on double failure
-        # After Phase 0, should return {}
-        with pytest.raises(json.JSONDecodeError):
-            client.chat_json("system", "user")
+        result = client.chat_json("system", "user")
+        assert result == {}
+
+    def test_chat_json_none_response_returns_empty(self, mock_openai):
+        mock_openai.chat.completions.create.return_value = make_empty_response()
+        client = LLMClient(api_key="test-key")
+        result = client.chat_json("system", "user")
+        assert result == {}
+
+    def test_retry_on_api_timeout(self, mock_openai):
+        import openai as openai_mod
+        mock_openai.chat.completions.create.side_effect = [
+            openai_mod.APITimeoutError(request=MagicMock()),
+            make_response("recovered"),
+        ]
+        client = LLMClient(api_key="test-key")
+        result = client.chat("system", "user")
+        assert result == "recovered"
+        assert mock_openai.chat.completions.create.call_count == 2
+
+    def test_max_retries_returns_none(self, mock_openai):
+        import openai as openai_mod
+        mock_openai.chat.completions.create.side_effect = openai_mod.APIConnectionError(
+            request=MagicMock()
+        )
+        client = LLMClient(api_key="test-key")
+        result = client.chat("system", "user")
+        assert result is None
 
 
 class TestGetStats:
