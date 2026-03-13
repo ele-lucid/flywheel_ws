@@ -88,3 +88,9 @@
 {"cycle": 3, "lesson": "Integrate goal locations into the waypoint generation logic to ensure goals are visited."}
 {"cycle": 3, "lesson": "Enhance the coverage algorithm to increase the number of cells visited within the time limit."}
 {"cycle": 3, "lesson": "Implement a more efficient path planning strategy to optimize coverage and goal visitation."}
+{"cycle": 4, "lesson": "Incorporate goal locations into the waypoint generation or navigation strategy to ensure goals are visited."}
+{"cycle": 4, "lesson": "Improve the recovery strategy for the stuck condition to reduce time spent without progress, possibly by implementing more dynamic obstacle avoidance maneuvers."}
+{"cycle": 4, "lesson": "Enhance the obstacle detection and avoidance logic to handle tight spaces and prevent repeated stuck situations."}
+{"cycle": 5, "lesson": "Incorporate goal locations into the waypoint generation process to ensure that all goals are visited."}
+{"cycle": 5, "lesson": "Improve the coverage strategy by dynamically adjusting waypoints based on unvisited areas to increase coverage efficiency."}
+{"cycle": 5, "lesson": "Optimize path planning algorithms to reduce total distance traveled and increase efficiency."}

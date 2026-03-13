@@ -1,6 +1,5 @@
 import math
 from flywheel_missions.base_mission import BaseMission
-from geometry_msgs.msg import Pose
 
 class LawnMowerMission(BaseMission):
     def __init__(self):
@@ -9,6 +8,8 @@ class LawnMowerMission(BaseMission):
         self.current_waypoint_index = 0
         self.state = 'MOVE_TO_WAYPOINT'
         self.stuck_counter = 0
+        self.avoid_counter = 0
+        self.recover_counter = 0
         self.generate_waypoints()
 
     def generate_waypoints(self):
@@ -89,10 +90,11 @@ class LawnMowerMission(BaseMission):
                 self.state = 'MOVE_TO_WAYPOINT'
 
         elif self.state == 'RECOVER':
-            self.move(linear=-0.15)
-            self.state = 'TURN'
-
-        elif self.state == 'TURN':
-            self.move(angular=0.3)
-            if abs(heading_error) < 5:
+            if self.recover_counter < 20:
+                self.move(linear=-0.15)
+            elif self.recover_counter < 40:
+                self.move(angular=0.3)
+            else:
                 self.state = 'MOVE_TO_WAYPOINT'
+                self.recover_counter = 0
+            self.recover_counter += 1
