@@ -303,7 +303,7 @@ finally:
 
         # Teleport robot to origin via Gazebo and reset world model
         self._reset_robot()
-        time.sleep(1)  # Wait for odom to settle after teleport
+        time.sleep(0.5)  # Wait for odom to settle after teleport
 
         # ============================================
         # PHASE 1: PERCEIVE
@@ -422,6 +422,7 @@ finally:
         self.get_logger().info(f'  Collisions: {evaluation["details"]["collision_count"]}')
 
         # LLM analysis
+        analysis = None
         if self.llm.call_count < self.max_llm_calls:
             analysis = self.log_analyzer.analyze(
                 code, evaluation, sensor_log,
@@ -462,6 +463,8 @@ finally:
             with open(best_path, 'w') as f:
                 f.write(code)
             self.get_logger().info(f'  NEW BEST! {score} > {best_score}')
+            # Publish progress and push to GitHub
+            self._publish_progress(cycle, score, evaluation, analysis, [])
 
         # Cycle summary
         self.get_logger().info(f'\nCYCLE {cycle} COMPLETE')
@@ -483,8 +486,8 @@ finally:
         self.cycle += 1
 
         # Brief pause before next cycle
-        self.get_logger().info('Pausing 5s before next cycle...')
-        time.sleep(5)
+        self.get_logger().info('Pausing 2s before next cycle...')
+        time.sleep(2)
 
     def _record_score(self, score):
         """Add score to rolling window and trigger lesson reset if median is too low."""
@@ -527,6 +530,120 @@ finally:
         # Reset world model (clears goals_visited and sets odom offset)
         self.reset_pub.publish(Empty())
         self.get_logger().info('Published reset to world model')
+
+    def _publish_progress(self, cycle, score, evaluation, analysis, lessons_list):
+        """Update PROGRESS.md and push to git when there's a new best score."""
+        try:
+            workspace = self.workspace_path
+            progress_path = os.path.join(workspace, 'PROGRESS.md')
+
+            # Build progress report
+            details = evaluation.get('details', {})
+            cells = details.get('cells_visited', 0)
+            distance = details.get('total_distance', 0)
+            collisions = details.get('collision_count', 0)
+            goals = details.get('goals_visited', [])
+
+            # Read existing progress or start fresh
+            existing = ''
+            if os.path.exists(progress_path):
+                with open(progress_path, 'r') as f:
+                    existing = f.read()
+
+            # Parse existing entries to build history table
+            header = (
+                "# Flywheel Learning Progress\n\n"
+                "Autonomous learning log. The robot iterates on its own mission code "
+                "to maximize coverage of a 20x20m arena with obstacles.\n\n"
+                "## Score History\n\n"
+                "| Cycle | Score | Cells | Distance | Collisions | Goals |\n"
+                "|-------|-------|-------|----------|------------|-------|\n"
+            )
+
+            # Extract existing table rows
+            table_rows = []
+            if existing:
+                for line in existing.split('\n'):
+                    if line.startswith('|') and not line.startswith('| Cycle') and not line.startswith('|---'):
+                        table_rows.append(line)
+
+            # Add new row
+            table_rows.append(
+                f"| {cycle} | **{score:.1f}** | {cells} | {distance:.1f}m | {collisions} | {len(goals)} |"
+            )
+
+            # Extract existing learnings section
+            learnings_section = ''
+            if '## What the Robot is Learning' in existing:
+                learnings_section = existing.split('## What the Robot is Learning')[1]
+                if '## ' in learnings_section[1:]:
+                    learnings_section = learnings_section[:learnings_section.index('## ', 1)]
+
+            # Build new learnings entry
+            new_learnings = f"\n### Cycle {cycle} (Score: {score:.1f})\n\n"
+            if analysis:
+                success = analysis.get('success_factors', [])
+                if success:
+                    new_learnings += "**What worked:**\n"
+                    for s in success[:3]:
+                        new_learnings += f"- {s}\n"
+
+                failures = analysis.get('failure_modes', [])
+                if failures:
+                    new_learnings += "\n**What didn't work:**\n"
+                    for f_item in failures[:3]:
+                        new_learnings += f"- {f_item}\n"
+
+                root = analysis.get('root_causes', [])
+                if root:
+                    new_learnings += "\n**Root causes:**\n"
+                    for r in root[:2]:
+                        new_learnings += f"- {r}\n"
+
+            new_lessons = analysis.get('lessons', []) if analysis else []
+            if new_lessons:
+                new_learnings += "\n**Lessons learned:**\n"
+                for l in new_lessons[:3]:
+                    new_learnings += f"- {l}\n"
+
+            new_learnings += f"\n**Cells covered: {cells}/350** ({cells*100//350}% of arena)\n"
+
+            # Assemble the full document
+            content = header
+            content += '\n'.join(table_rows) + '\n'
+            content += '\n## What the Robot is Learning\n'
+            content += learnings_section + new_learnings
+
+            with open(progress_path, 'w') as f:
+                f.write(content)
+
+            # Git commit and push
+            subprocess.run(
+                ['git', 'add', 'PROGRESS.md', 'memory/best_mission.py',
+                 'memory/code_history.jsonl', 'memory/lessons.jsonl'],
+                cwd=workspace, capture_output=True, timeout=10
+            )
+            commit_msg = (
+                f"cycle {cycle}: score {score:.1f}, {cells} cells covered\n\n"
+                f"Coverage: {cells}/350 ({cells*100//350}%)\n"
+                f"Distance: {distance:.1f}m, Collisions: {collisions}\n"
+                f"Goals: {len(goals)}/5"
+            )
+            subprocess.run(
+                ['git', 'commit', '-m', commit_msg],
+                cwd=workspace, capture_output=True, timeout=10
+            )
+            result = subprocess.run(
+                ['git', 'push'],
+                cwd=workspace, capture_output=True, text=True, timeout=30
+            )
+            if result.returncode == 0:
+                self.get_logger().info(f'  Pushed progress to GitHub (cycle {cycle}, score {score:.1f})')
+            else:
+                self.get_logger().warn(f'  Git push failed: {result.stderr}')
+
+        except Exception as e:
+            self.get_logger().warn(f'  Failed to publish progress: {e}')
 
     def _build_reason_prompt(self, world_state, lessons, last_eval, best_score):
         parts = []
