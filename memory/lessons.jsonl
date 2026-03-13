@@ -100,3 +100,23 @@
 {"cycle": 7, "lesson": "Integrate goal locations into the waypoint generation to ensure goals are prioritized in the path."}
 {"cycle": 7, "lesson": "Enhance the state machine to dynamically adjust strategies based on time constraints and proximity to goals."}
 {"cycle": 7, "lesson": "Optimize the lawnmower pattern or consider alternative path planning strategies that balance coverage with goal acquisition."}
+{"cycle": 8, "lesson": "Incorporate a goal prioritization mechanism in the waypoint navigation to ensure goals are visited."}
+{"cycle": 8, "lesson": "Optimize the state machine logic for obstacle avoidance and recovery to improve efficiency and prevent timeouts."}
+{"cycle": 8, "lesson": "Adapt the coverage strategy to better suit the environment, potentially using dynamic path planning instead of a fixed lawnmower pattern."}
+{"cycle": 9, "lesson": "Implement a goal-oriented navigation strategy to ensure goals are prioritized and visited."}
+{"cycle": 9, "lesson": "Optimize the path planning algorithm to reduce unnecessary travel and improve efficiency."}
+{"cycle": 9, "lesson": "Enhance the recovery strategy to reduce time spent in 'stuck' states and improve mission completion time."}
+{"cycle": 10, "lesson": "Incorporate goal locations into the waypoint generation to ensure goals are visited."}
+{"cycle": 10, "lesson": "Optimize the coverage strategy to improve efficiency and prevent timeouts."}
+{"cycle": 10, "lesson": "Enhance the path planning algorithm to maximize area coverage within the time limit."}
+{"cycle": 10, "lesson": "Implement a dynamic goal prioritization system to ensure goals are prioritized during navigation."}
+{"cycle": 11, "lesson": "Incorporate goal locations into the waypoint generation to ensure that the robot visits goals during its path."}
+{"cycle": 11, "lesson": "Improve the recovery mechanism for the 'stuck' state to reduce the time spent in this condition."}
+{"cycle": 11, "lesson": "Enhance the obstacle avoidance strategy to allow for more fluid navigation around obstacles, possibly by integrating more sophisticated path planning algorithms."}
+{"cycle": 12, "lesson": "Integrate goal positions into the waypoint generation strategy to ensure goals are prioritized."}
+{"cycle": 12, "lesson": "Enhance the recovery strategy to include more robust methods for getting unstuck, such as dynamic replanning when stuck is detected."}
+{"cycle": 12, "lesson": "Re-evaluate the lawnmower pattern and consider alternative coverage strategies that adapt to the environment's layout."}
+{"cycle": 12, "lesson": "Improve the obstacle avoidance logic to handle complex obstacle configurations that lead to the robot getting stuck repeatedly."}
+{"cycle": 13, "lesson": "Integrate goal prioritization into the waypoint navigation to ensure goals are visited."}
+{"cycle": 13, "lesson": "Implement a time management strategy that dynamically adjusts the mission plan to avoid timeouts."}
+{"cycle": 13, "lesson": "Optimize the coverage pattern to improve efficiency and increase the coverage score."}

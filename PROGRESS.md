@@ -12,6 +12,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 | 5 | **29.8** | 37 | 51.9m | 0 | 0 |
 | 6 | **31.9** | 52 | 55.1m | 0 | 0 |
 | 7 | **32.8** | 58 | 56.5m | 0 | 0 |
+| 13 | **33.1** | 60 | 58.5m | 0 | 0 |
 
 ## What the Robot is Learning
 
@@ -20,29 +21,30 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 
 
 
+
 #
 #
 #
 #
 #
-### Cycle 7 (Score: 32.8)
+#
+### Cycle 13 (Score: 33.1)
 
 **What worked:**
-- The robot did not collide with any obstacles, achieving a collision_score of 100.
-- The robot covered 58 cells, achieving a partial coverage_score of 16.6.
+- The robot did not collide with any obstacles, achieving a perfect collision score of 100.
 
 **What didn't work:**
-- The robot failed to visit any goals, resulting in a goals_score of 0.0.
-- The robot timed out and did not complete the mission, as indicated by the 'timed_out' flag being true.
-- The robot's efficiency score was 0, suggesting inefficient path planning or execution.
+- The robot failed to visit any of the 5 goals.
+- The robot timed out before completing the mission.
+- The robot only covered 17.1% of the area, visiting 60 cells out of a target of 350.
 
 **Root causes:**
-- The waypoint generation strategy did not account for goal locations, leading to a failure to visit any goals.
-- The robot's state machine and recovery strategies were not effective in completing the mission within the time limit.
+- The waypoint navigation strategy did not prioritize goal locations, leading to zero goals being visited.
+- The robot's state machine did not handle time management effectively, resulting in a timeout.
 
 **Lessons learned:**
-- Integrate goal locations into the waypoint generation to ensure goals are prioritized in the path.
-- Enhance the state machine to dynamically adjust strategies based on time constraints and proximity to goals.
-- Optimize the lawnmower pattern or consider alternative path planning strategies that balance coverage with goal acquisition.
+- Integrate goal prioritization into the waypoint navigation to ensure goals are visited.
+- Implement a time management strategy that dynamically adjusts the mission plan to avoid timeouts.
+- Optimize the coverage pattern to improve efficiency and increase the coverage score.
 
-**Cells covered: 58/350** (16% of arena)
+**Cells covered: 60/350** (17% of arena)

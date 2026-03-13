@@ -57,7 +57,8 @@ class LawnMowerMission(BaseMission):
             self.state = 'AVOID_OBSTACLE'
             self.avoid_counter = 0
         elif obstacles["front"] < 0.6:
-            self.move(linear=0.2, angular=0.2 if obstacles["front_left"] < obstacles["front_right"] else -0.2)
+            steer = 0.2 if obstacles["front_left"] < obstacles["front_right"] else -0.2
+            self.move(linear=0.2, angular=steer)
             return
         elif obstacles["left"] < 0.4:
             self.move(linear=0.5, angular=-0.2)
