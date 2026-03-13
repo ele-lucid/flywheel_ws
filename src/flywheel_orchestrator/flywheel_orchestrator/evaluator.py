@@ -6,12 +6,12 @@ import os
 
 from flywheel_common.constants import GOALS, ARENA_CELLS
 
-# Scoring weights
-W_GOALS = 0.40
-W_EFFICIENCY = 0.15
+# Scoring weights -- coverage-first objective
+W_GOALS = 0.10
+W_EFFICIENCY = 0.05
 W_COLLISIONS = 0.20
-W_COVERAGE = 0.15
-W_COMPLETION = 0.10
+W_COVERAGE = 0.50
+W_COMPLETION = 0.15
 
 
 def evaluate_mission(mission_result, sensor_log_path=None):

@@ -165,6 +165,14 @@ class Orchestrator(Node):
         workspace = runner.workspace_path
         timeout = runner.timeout
 
+        # Open sensor log for recording world model during execution
+        sensor_log_path = os.path.join(log_dir, 'sensor_log.jsonl') if log_dir else None
+        sensor_log_file = None
+        if sensor_log_path:
+            os.makedirs(log_dir, exist_ok=True)
+            sensor_log_file = open(sensor_log_path, 'w')
+        last_log_time = 0
+
         cmd = [
             sys.executable, '-c',
             f"""
@@ -215,6 +223,13 @@ finally:
             # Poll instead of blocking on communicate()
             while proc.poll() is None:
                 rclpy.spin_once(self, timeout_sec=0.1)
+
+                # Log world model state at ~5Hz for coverage evaluation
+                now = time.time()
+                if sensor_log_file and self._world_state and (now - last_log_time) >= 0.2:
+                    sensor_log_file.write(json.dumps(self._world_state) + '\n')
+                    last_log_time = now
+
                 if time.time() - start_time > timeout:
                     os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
                     time.sleep(2)
@@ -236,6 +251,11 @@ finally:
             result.crashed = True
 
         result.duration = time.time() - start_time
+
+        # Close sensor log
+        if sensor_log_file:
+            sensor_log_file.flush()
+            sensor_log_file.close()
 
         if result.exit_code != 0 and not result.timed_out:
             result.crashed = True
@@ -281,9 +301,9 @@ finally:
         # Reset LLM call counter
         self.llm.call_count = 0
 
-        # Publish reset to clear goals_visited in world_model before perceiving
-        self.reset_pub.publish(Empty())
-        self.get_logger().info('Published reset to /flywheel/reset')
+        # Teleport robot to origin via Gazebo and reset world model
+        self._reset_robot()
+        time.sleep(1)  # Wait for odom to settle after teleport
 
         # ============================================
         # PHASE 1: PERCEIVE
@@ -325,9 +345,11 @@ finally:
         # Ask LLM for mission plan
         reason_prompt = self._build_reason_prompt(world_state, current_lessons, last_eval, best_score)
         mission_plan = self.llm.chat(
-            "You are a mission planner for a differential drive robot navigating an obstacle arena. "
-            "Given the world state and lessons, produce a clear, specific mission plan. "
-            "Focus on: which goals to target, navigation strategy, obstacle avoidance approach. "
+            "You are a mission planner for a differential drive robot in a 20x20m arena with obstacles. "
+            "The PRIMARY OBJECTIVE is FULL AREA COVERAGE: visit every square meter of the arena floor. "
+            "Use systematic coverage patterns (lawnmower/boustrophedon, spiral, wall-following). "
+            "Avoid revisiting areas already covered. Track coverage progress via visited grid cells. "
+            "Secondary: visit goal markers when they are along the coverage path. "
             "Be concise, 3-5 sentences.",
             reason_prompt,
             temperature=0.7
@@ -482,6 +504,30 @@ finally:
                 self.lessons.clear_recent(n=10)
                 self._recent_scores.clear()
 
+    def _reset_robot(self):
+        """Teleport robot to origin via Gazebo service and reset world model."""
+        try:
+            result = subprocess.run(
+                ['gz', 'service', '-s', '/world/flywheel_arena/set_pose',
+                 '--reqtype', 'gz.msgs.Pose',
+                 '--reptype', 'gz.msgs.Boolean',
+                 '--req',
+                 'name: "flywheel_bot", position: {x: 0, y: 0, z: 0.05}, '
+                 'orientation: {x: 0, y: 0, z: 0, w: 1}',
+                 '--timeout', '5000'],
+                capture_output=True, text=True, timeout=10
+            )
+            if 'true' in result.stdout:
+                self.get_logger().info('Robot teleported to origin')
+            else:
+                self.get_logger().warn(f'Set pose response: {result.stdout} {result.stderr}')
+        except Exception as e:
+            self.get_logger().warn(f'Failed to reset robot pose: {e}')
+
+        # Reset world model (clears goals_visited and sets odom offset)
+        self.reset_pub.publish(Empty())
+        self.get_logger().info('Published reset to world model')
+
     def _build_reason_prompt(self, world_state, lessons, last_eval, best_score):
         parts = []
         parts.append(f"## Current World State\n```json\n{json.dumps(world_state, indent=2)}\n```\n")
@@ -502,11 +548,12 @@ finally:
 
         parts.append(
             "\n## Task\n"
-            "Produce a mission plan. Be specific about:\n"
-            "1. Which goals to visit and in what order\n"
-            "2. Navigation strategy (direct approach, wall-following, etc.)\n"
-            "3. Obstacle avoidance behavior\n"
-            "4. What to do differently from last time\n"
+            "Produce a COVERAGE-FOCUSED mission plan. Be specific about:\n"
+            "1. Coverage pattern (lawnmower rows, spiral, wall-follow-then-fill)\n"
+            "2. How to systematically sweep unvisited areas (track visited cells as 1m grid)\n"
+            "3. Obstacle avoidance while maintaining coverage pattern\n"
+            "4. What to do differently from last time to increase cells_visited count\n"
+            f"Arena is 20x20m (-10 to 10 on each axis). Target: cover all {350} reachable cells.\n"
         )
         return '\n'.join(parts)
 

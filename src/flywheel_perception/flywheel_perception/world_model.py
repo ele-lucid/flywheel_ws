@@ -8,7 +8,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy
 from rcl_interfaces.msg import ParameterDescriptor
-from std_msgs.msg import String
+from std_msgs.msg import String, Empty
 from nav_msgs.msg import Odometry
 from flywheel_common.constants import GOALS, GOAL_REACH_DIST
 
@@ -76,7 +76,7 @@ class WorldModel(Node):
         self.odom_sub = self.create_subscription(
             Odometry, '/odom', self.odom_cb, odom_qos)
         self.reset_sub = self.create_subscription(
-            String, '/flywheel/reset', self.reset_cb, reset_qos)
+            Empty, '/flywheel/reset', self.reset_cb, reset_qos)
 
         # ── Publisher ────────────────────────────────────────────────
         self.pub = self.create_publisher(String, '/perception/world_model', pub_qos)
@@ -88,6 +88,14 @@ class WorldModel(Node):
         self.pose = {'x': 0.0, 'y': 0.0, 'heading_deg': 0.0}
         self.velocity = {'linear': 0.0, 'angular': 0.0}
         self.goals_visited = set()
+
+        # Odom offset correction (reset zeroes the robot's reported position)
+        self._odom_offset_x = 0.0
+        self._odom_offset_y = 0.0
+        self._odom_offset_yaw = 0.0
+        self._raw_odom_x = 0.0
+        self._raw_odom_y = 0.0
+        self._raw_odom_yaw = 0.0
 
         # Sensor staleness tracking
         self.last_update = {
@@ -126,11 +134,16 @@ class WorldModel(Node):
         self.last_update['odom'] = time.time()
         p = msg.pose.pose.position
         q = msg.pose.pose.orientation
+        raw_x = p.x
+        raw_y = p.y
         self.pose = {
-            'x': round(p.x, 3),
-            'y': round(p.y, 3),
-            'heading_deg': round(quaternion_to_yaw(q.x, q.y, q.z, q.w), 2),
+            'x': round(raw_x - self._odom_offset_x, 3),
+            'y': round(raw_y - self._odom_offset_y, 3),
+            'heading_deg': round(quaternion_to_yaw(q.x, q.y, q.z, q.w) - self._odom_offset_yaw, 2),
         }
+        self._raw_odom_x = raw_x
+        self._raw_odom_y = raw_y
+        self._raw_odom_yaw = quaternion_to_yaw(q.x, q.y, q.z, q.w)
         self.velocity = {
             'linear': round(msg.twist.twist.linear.x, 3),
             'angular': round(msg.twist.twist.angular.z, 3),
@@ -146,15 +159,21 @@ class WorldModel(Node):
 
     # ── Reset callback ───────────────────────────────────────────────
 
-    def reset_cb(self, msg):
-        self.get_logger().info(f'Reset received: {msg.data}')
+    def reset_cb(self, _msg):
+        self.get_logger().info('Reset received')
         self.goals_visited.clear()
         self.lidar_data = {}
         self.depth_data = {}
         self.imu_data = {}
+        # Capture current raw odom as new offset so pose reports (0,0,0)
+        self._odom_offset_x = self._raw_odom_x
+        self._odom_offset_y = self._raw_odom_y
+        self._odom_offset_yaw = self._raw_odom_yaw
         self.pose = {'x': 0.0, 'y': 0.0, 'heading_deg': 0.0}
         self.velocity = {'linear': 0.0, 'angular': 0.0}
         self.last_update = {k: 0.0 for k in self.last_update}
+        self.get_logger().info(f'Odom offset set to ({self._odom_offset_x:.2f}, '
+                               f'{self._odom_offset_y:.2f}, yaw={self._odom_offset_yaw:.1f})')
 
         # Rotate log file
         if self.log_file:

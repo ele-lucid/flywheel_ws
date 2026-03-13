@@ -135,11 +135,11 @@ class TestTotalScore:
         result = FakeMissionResult()
         ev = evaluate_mission(result, str(log))
         expected = (
-            ev['goals_score'] * 0.40 +
-            ev['efficiency_score'] * 0.15 +
+            ev['goals_score'] * 0.10 +
+            ev['efficiency_score'] * 0.05 +
             ev['collision_score'] * 0.20 +
-            ev['coverage_score'] * 0.15 +
-            ev['completion_score'] * 0.10
+            ev['coverage_score'] * 0.50 +
+            ev['completion_score'] * 0.15
         )
         assert ev['total_score'] == pytest.approx(expected, abs=0.2)
 

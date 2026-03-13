@@ -46,10 +46,16 @@ class LidarProcessor(Node):
             'sector_count', 8,
             ParameterDescriptor(description='Number of angular sectors to divide the scan into'),
         )
+        self.declare_parameter(
+            'min_distance', 0.30,
+            ParameterDescriptor(description='Minimum distance filter to exclude robot chassis self-detection'),
+        )
+
+        self.min_distance = self.get_parameter('min_distance').get_parameter_value().double_value
 
         self.sub = self.create_subscription(LaserScan, '/scan', self.scan_cb, SENSOR_QOS)
         self.pub = self.create_publisher(String, '/perception/lidar_summary', PROCESSED_QOS)
-        self.get_logger().info('Lidar processor started (explicit QoS)')
+        self.get_logger().info(f'Lidar processor started (min_distance={self.min_distance}m)')
 
     def scan_cb(self, msg: LaserScan):
         n = len(msg.ranges)
@@ -70,17 +76,17 @@ class LidarProcessor(Node):
                     # Handle front sector wrapping
                     if angle_deg >= (360 + lo_deg) or angle_deg <= hi_deg:
                         r = msg.ranges[j]
-                        if msg.range_min <= r <= msg.range_max and r < min_dist:
+                        if self.min_distance <= r <= msg.range_max and r < min_dist:
                             min_dist = r
                 elif hi_deg > 360:
                     if angle_deg >= lo_deg or angle_deg <= (hi_deg - 360):
                         r = msg.ranges[j]
-                        if msg.range_min <= r <= msg.range_max and r < min_dist:
+                        if self.min_distance <= r <= msg.range_max and r < min_dist:
                             min_dist = r
                 else:
                     if lo_deg <= angle_deg <= hi_deg:
                         r = msg.ranges[j]
-                        if msg.range_min <= r <= msg.range_max and r < min_dist:
+                        if self.min_distance <= r <= msg.range_max and r < min_dist:
                             min_dist = r
 
             sector_mins[SECTORS[i]] = round(min_dist, 3) if min_dist != float('inf') else 99.0
