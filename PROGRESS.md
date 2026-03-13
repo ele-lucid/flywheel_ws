@@ -8,29 +8,32 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 |-------|-------|-------|----------|------------|-------|
 | 1 | **31.9** | 52 | 88.7m | 0 | 0 |
 | 2 | **33.6** | 64 | 82.2m | 0 | 0 |
+| 3 | **27.2** | 19 | 115.6m | 0 | 0 |
 
 ## What the Robot is Learning
 
 
+
 #
-### Cycle 2 (Score: 33.6)
+#
+### Cycle 3 (Score: 27.2)
 
 **What worked:**
-- The robot successfully avoided collisions, with a collision_score of 100 and collision_count of 0.
-- The robot was able to recover from stuck conditions without crashing, as evidenced by 'crashed' being false.
+- The robot did not collide with any obstacles, achieving a collision_score of 100.
+- The mission completed successfully without crashing.
 
 **What didn't work:**
 - The robot did not visit any goals, resulting in a goals_score of 0.0.
-- The mission timed out without completing all waypoints, as indicated by the 'timed_out' flag being true.
-- The robot's efficiency score was 0, indicating inefficient path planning or execution.
+- The robot only covered 19 cells, leading to a low coverage_score of 5.4.
+- The mission timed out, indicating inefficiency in task completion.
 
 **Root causes:**
-- The waypoint generation and navigation logic did not account for goal locations, leading to no goals being visited.
-- The robot's path planning did not efficiently cover the arena, leading to a timeout before completing the mission.
+- The robot's waypoint navigation did not align with the goal locations, preventing goal visitation.
+- The coverage strategy was inefficient, covering only 19 cells in 92.01 seconds.
 
 **Lessons learned:**
-- Incorporate goal locations into waypoint planning to ensure goals are visited.
-- Optimize path planning algorithms to ensure more efficient coverage of the arena, possibly by implementing a more sophisticated search pattern.
-- Improve the robot's movement logic to enhance efficiency, such as by minimizing unnecessary turns and optimizing speed settings.
+- Integrate goal locations into the waypoint generation logic to ensure goals are visited.
+- Enhance the coverage algorithm to increase the number of cells visited within the time limit.
+- Implement a more efficient path planning strategy to optimize coverage and goal visitation.
 
-**Cells covered: 64/350** (18% of arena)
+**Cells covered: 19/350** (5% of arena)

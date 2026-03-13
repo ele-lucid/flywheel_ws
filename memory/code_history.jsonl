@@ -1,1 +1,4 @@
 {"cycle": 0, "score": 25.0, "code_path": "seed", "details": {}}
+{"cycle": 1, "score": 24.6, "code_path": "/home/andrew-ashur/projects/flywheel_ws/src/flywheel_missions/flywheel_missions/generated/mission_v001.py"}
+{"cycle": 2, "score": 23.4, "code_path": "/home/andrew-ashur/projects/flywheel_ws/src/flywheel_missions/flywheel_missions/generated/mission_v002.py"}
+{"cycle": 3, "score": 27.2, "code_path": "/home/andrew-ashur/projects/flywheel_ws/src/flywheel_missions/flywheel_missions/generated/mission_v003.py"}

@@ -78,3 +78,13 @@
 {"cycle": 2, "lesson": "Incorporate goal locations into waypoint planning to ensure goals are visited."}
 {"cycle": 2, "lesson": "Optimize path planning algorithms to ensure more efficient coverage of the arena, possibly by implementing a more sophisticated search pattern."}
 {"cycle": 2, "lesson": "Improve the robot's movement logic to enhance efficiency, such as by minimizing unnecessary turns and optimizing speed settings."}
+{"cycle": 1, "lesson": "Implement a more dynamic waypoint generation strategy that considers the positions of goals and obstacles."}
+{"cycle": 1, "lesson": "Enhance the state machine logic to ensure that the robot can effectively transition between states and recover from navigation errors."}
+{"cycle": 1, "lesson": "Incorporate a method to verify and adjust the robot's path if it remains in a small area for an extended period."}
+{"cycle": 2, "lesson": "Implement boundary checks in waypoint generation to ensure the robot remains within the arena."}
+{"cycle": 2, "lesson": "Enhance the heading control logic to better align the robot towards goals and improve goal visitation."}
+{"cycle": 2, "lesson": "Refine the recovery mechanism to ensure it effectively addresses being stuck and prevents crashes."}
+{"cycle": 2, "lesson": "Investigate and resolve the assertion error in the geometry_msgs conversion to ensure proper data handling."}
+{"cycle": 3, "lesson": "Integrate goal locations into the waypoint generation logic to ensure goals are visited."}
+{"cycle": 3, "lesson": "Enhance the coverage algorithm to increase the number of cells visited within the time limit."}
+{"cycle": 3, "lesson": "Implement a more efficient path planning strategy to optimize coverage and goal visitation."}
