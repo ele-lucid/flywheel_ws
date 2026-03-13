@@ -534,7 +534,7 @@ finally:
     def _publish_progress(self, cycle, score, evaluation, analysis, lessons_list):
         """Update PROGRESS.md and push to git when there's a new best score."""
         try:
-            workspace = self.workspace_path
+            workspace = self.ws_path
             progress_path = os.path.join(workspace, 'PROGRESS.md')
 
             # Build progress report
@@ -619,8 +619,7 @@ finally:
 
             # Git commit and push
             subprocess.run(
-                ['git', 'add', 'PROGRESS.md', 'memory/best_mission.py',
-                 'memory/code_history.jsonl', 'memory/lessons.jsonl'],
+                ['git', 'add', 'PROGRESS.md', 'memory/'],
                 cwd=workspace, capture_output=True, timeout=10
             )
             commit_msg = (

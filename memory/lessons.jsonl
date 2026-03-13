@@ -1,0 +1,80 @@
+{"cycle": 0, "lessons": ["Boustrophedon pattern works: generate east-west row waypoints alternating direction, 1m spacing, stay 0.5m from walls", "Drive at 0.45 m/s for maximum coverage speed. Slower wastes time, faster causes overshoot", "Proportional heading control (error * 0.03) works well for smooth steering", "When obstacle detected at front < 0.6m, arc around it while continuing forward progress", "Track visited_cells = set((int(round(x)), int(round(y)))) to measure coverage", "If stuck (velocity near zero for 20+ ticks), back up and turn 90 degrees to recover"]}
+{"cycle": 1, "lesson": "Verify and test the waypoint generation logic to ensure it directs the robot towards actual goals."}
+{"cycle": 1, "lesson": "Implement logging for state transitions and movement commands to diagnose why the robot did not move."}
+{"cycle": 1, "lesson": "Introduce a mechanism to detect and handle situations where the robot is not progressing as expected, possibly through additional state checks or recovery logic."}
+{"cycle": 1, "lesson": "Improve waypoint planning to ensure the robot can visit all goals efficiently."}
+{"cycle": 1, "lesson": "Enhance the obstacle avoidance and recovery algorithms to minimize the time spent in stuck recovery."}
+{"cycle": 1, "lesson": "Consider implementing a more dynamic coverage strategy that allows the robot to adapt its path based on real-time feedback."}
+{"cycle": 2, "lesson": "Implement a more adaptive path planning algorithm that can dynamically adjust to the environment and ensure all goals are visited."}
+{"cycle": 2, "lesson": "Enhance the stuck detection and recovery mechanism to reduce the frequency of recovery actions and improve efficiency."}
+{"cycle": 2, "lesson": "Optimize waypoint navigation to ensure better coverage and reduce time spent in non-productive maneuvers."}
+{"cycle": 1, "lesson": "Implement a more robust obstacle avoidance strategy that allows the robot to navigate around obstacles without getting stuck."}
+{"cycle": 1, "lesson": "Increase the timeout duration to allow the robot more time to complete its mission, or optimize path planning to improve efficiency."}
+{"cycle": 1, "lesson": "Enhance the waypoint navigation logic to ensure the robot can reach more goals and cover a larger area."}
+{"cycle": 2, "lesson": "Implement a more dynamic path planning strategy that adapts to goal proximity and obstacle distribution."}
+{"cycle": 2, "lesson": "Optimize the recovery mechanism to reduce time spent in recovery mode and improve overall mission efficiency."}
+{"cycle": 2, "lesson": "Enhance the coverage algorithm to ensure more comprehensive area coverage, possibly by adjusting waypoint spacing or pattern."}
+{"cycle": 1, "lesson": "Implement dynamic path planning that adapts to real-time goal and obstacle data to improve goal coverage."}
+{"cycle": 1, "lesson": "Increase the robot's speed or optimize the waypoint navigation logic to cover more area within the time limit."}
+{"cycle": 1, "lesson": "Incorporate a mechanism to prioritize goal visitation over strict waypoint following to enhance goal coverage."}
+{"cycle": 2, "lesson": "Incorporate a dynamic goal prioritization system to ensure all goals are visited within the time limit."}
+{"cycle": 2, "lesson": "Optimize speed and waypoint reach parameters to improve coverage efficiency and prevent timeouts."}
+{"cycle": 2, "lesson": "Adjust the boustrophedon pattern to better fit the environment and increase cell coverage."}
+{"cycle": 3, "lesson": "Increase waypoint density or adjust the navigation strategy to ensure more comprehensive coverage of the area."}
+{"cycle": 3, "lesson": "Improve the stuck recovery logic to reduce the frequency and duration of stuck events, possibly by incorporating more sophisticated obstacle avoidance or path planning algorithms."}
+{"cycle": 3, "lesson": "Optimize the robot's speed and path planning to ensure timely completion of missions, potentially by adjusting the SPEED parameter or improving the efficiency of the navigation algorithm."}
+{"cycle": 1, "lesson": "Implement a more dynamic path planning algorithm that can adapt to the environment and prioritize goal visitation."}
+{"cycle": 1, "lesson": "Increase the robot's speed or optimize movement efficiency to cover more area within the available time."}
+{"cycle": 1, "lesson": "Incorporate a mechanism to prioritize reaching goals over strict adherence to a pre-set waypoint path."}
+{"cycle": 2, "lesson": "Integrate goal location awareness into the waypoint navigation logic to ensure goals are prioritized."}
+{"cycle": 2, "lesson": "Optimize the recovery strategy to reduce time spent in recovery mode and prevent frequent triggering."}
+{"cycle": 2, "lesson": "Enhance obstacle detection and avoidance algorithms to minimize instances of the robot getting stuck."}
+{"cycle": 3, "lesson": "Incorporate goal prioritization logic to ensure the robot actively seeks out and visits goal locations."}
+{"cycle": 3, "lesson": "Implement more robust obstacle avoidance and recovery strategies to prevent the robot from getting stuck."}
+{"cycle": 3, "lesson": "Optimize the coverage pattern to adapt dynamically to obstacles and ensure broader area coverage."}
+{"cycle": 4, "lesson": "Implement a goal prioritization system to ensure the robot can identify and navigate towards goals effectively."}
+{"cycle": 4, "lesson": "Enhance the coverage algorithm to dynamically adjust waypoints based on real-time obstacle detection and path completion status."}
+{"cycle": 4, "lesson": "Improve the recovery and obstacle avoidance logic to handle complex scenarios and prevent crashes."}
+{"cycle": 1, "lesson": "Integrate goal-seeking logic into the navigation strategy to ensure goals are visited."}
+{"cycle": 1, "lesson": "Optimize the boustrophedon pattern or consider alternative coverage strategies to improve efficiency."}
+{"cycle": 1, "lesson": "Enhance the stuck detection and recovery mechanism to minimize time lost in recovery."}
+{"cycle": 2, "lesson": "Implement a dynamic timeout mechanism that adjusts based on the robot's progress towards goals."}
+{"cycle": 2, "lesson": "Incorporate goal-seeking behavior into the mission strategy to ensure all goals are visited."}
+{"cycle": 2, "lesson": "Optimize the path planning algorithm to improve efficiency, possibly by integrating obstacle avoidance with goal-directed navigation."}
+{"cycle": 3, "lesson": "Integrate goal-seeking logic to prioritize visiting goals during navigation."}
+{"cycle": 3, "lesson": "Enhance recovery and obstacle avoidance strategies to prevent crashes."}
+{"cycle": 3, "lesson": "Adapt the coverage pattern dynamically based on environmental feedback to improve coverage."}
+{"cycle": 3, "lesson": "Implement a more efficient path planning algorithm that considers both coverage and goal visitation."}
+{"cycle": 1, "lesson": "Implement a dynamic goal prioritization system to ensure all goals are visited within the mission time."}
+{"cycle": 1, "lesson": "Optimize speed and turning parameters to improve efficiency and reduce mission duration."}
+{"cycle": 1, "lesson": "Enhance obstacle detection and avoidance strategies to prevent getting stuck and reduce recovery time."}
+{"cycle": 2, "lesson": "Implement a goal prioritization mechanism to ensure that the robot visits goal locations during its mission."}
+{"cycle": 2, "lesson": "Optimize the recovery strategy to minimize time spent in recovery mode and prevent timeouts."}
+{"cycle": 2, "lesson": "Enhance obstacle detection and avoidance algorithms to reduce the frequency of getting stuck."}
+{"cycle": 3, "lesson": "Implement a goal prioritization and navigation strategy to ensure goals are visited during the mission."}
+{"cycle": 3, "lesson": "Extend the mission's time limit or optimize the coverage path to prevent timeouts."}
+{"cycle": 3, "lesson": "Enhance obstacle avoidance algorithms to prevent the robot from getting stuck, possibly by improving sensor data interpretation or path planning."}
+{"cycle": 4, "lesson": "Integrate goal prioritization into the waypoint navigation strategy to ensure goals are visited."}
+{"cycle": 4, "lesson": "Increase mission duration or optimize path planning to reduce time spent navigating."}
+{"cycle": 4, "lesson": "Enhance obstacle detection and avoidance algorithms to prevent the robot from getting stuck."}
+{"cycle": 5, "lesson": "Implement a goal prioritization mechanism to ensure goals are actively sought and visited."}
+{"cycle": 5, "lesson": "Enhance the path planning algorithm to reduce instances of getting stuck and improve efficiency."}
+{"cycle": 5, "lesson": "Consider increasing the robot's speed or optimizing the coverage path to ensure completion within the time limit."}
+{"cycle": 6, "lesson": "Integrate goal-seeking behavior into the navigation strategy to ensure goals are visited during the mission."}
+{"cycle": 6, "lesson": "Optimize the coverage strategy to reduce the time taken by either increasing speed or improving waypoint navigation efficiency."}
+{"cycle": 6, "lesson": "Implement a more efficient recovery strategy to minimize time lost when the robot gets stuck."}
+{"cycle": 1, "lesson": "Incorporate goal positions into the waypoint planning to ensure goals are visited during the mission."}
+{"cycle": 1, "lesson": "Optimize the path planning algorithm to ensure the robot can complete the coverage within the time constraints."}
+{"cycle": 1, "lesson": "Improve obstacle detection and avoidance algorithms to reduce instances of the robot getting stuck."}
+{"cycle": 2, "lesson": "Implement a more robust obstacle avoidance strategy that allows the robot to dynamically adjust its path when encountering obstacles."}
+{"cycle": 2, "lesson": "Enhance the waypoint navigation algorithm to include checks for reachable paths and adaptively skip or modify waypoints when necessary."}
+{"cycle": 2, "lesson": "Re-evaluate the timeout threshold or adjust the mission's goal completion criteria to ensure the robot has sufficient time to achieve its objectives."}
+{"cycle": 1, "lesson": "Incorporate goal locations into the waypoint generation process to ensure goals are prioritized and visited."}
+{"cycle": 1, "lesson": "Balance recovery strategies with efficient path planning to minimize timeouts and improve mission completion."}
+{"cycle": 1, "lesson": "Enhance the navigation algorithm to improve coverage efficiency and ensure a greater area of the arena is explored."}
+{"cycle": 1, "lesson": "Incorporate goal locations into the waypoint generation to ensure goals are visited."}
+{"cycle": 1, "lesson": "Implement a more dynamic path planning algorithm that adjusts to the environment and goals."}
+{"cycle": 1, "lesson": "Enhance the stuck detection and recovery strategy to prevent timeouts and improve efficiency."}
+{"cycle": 2, "lesson": "Incorporate goal locations into waypoint planning to ensure goals are visited."}
+{"cycle": 2, "lesson": "Optimize path planning algorithms to ensure more efficient coverage of the arena, possibly by implementing a more sophisticated search pattern."}
+{"cycle": 2, "lesson": "Improve the robot's movement logic to enhance efficiency, such as by minimizing unnecessary turns and optimizing speed settings."}
