@@ -1,3 +1,5 @@
+import os
+from glob import glob
 from setuptools import setup
 
 package_name = 'flywheel_perception'
@@ -12,6 +14,11 @@ setup(
     maintainer_email='aashur@lucidbots.com',
     description='Sensor processing and world model fusion',
     license='MIT',
+    data_files=[
+        ('share/ament_index/resource_index/packages', ['resource/flywheel_perception']),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+        (os.path.join('share', package_name), ['package.xml']),
+    ],
     entry_points={
         'console_scripts': [
             'lidar_processor = flywheel_perception.lidar_processor:main',

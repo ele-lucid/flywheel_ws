@@ -1,6 +1,6 @@
-from setuptools import setup, find_packages
 import os
 from glob import glob
+from setuptools import setup, find_packages
 
 package_name = 'flywheel_orchestrator'
 
@@ -15,6 +15,8 @@ setup(
     description='The flywheel agent brain',
     license='MIT',
     data_files=[
+        ('share/ament_index/resource_index/packages', ['resource/flywheel_orchestrator']),
+        (os.path.join('share', package_name), ['package.xml']),
         (os.path.join('share', package_name, 'prompts'), glob('flywheel_orchestrator/prompts/*.txt')),
     ],
     entry_points={

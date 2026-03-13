@@ -12,6 +12,10 @@ setup(
     maintainer_email='aashur@lucidbots.com',
     description='Mission base class and generated missions',
     license='MIT',
+    data_files=[
+        ('share/ament_index/resource_index/packages', ['resource/flywheel_missions']),
+        ('share/' + package_name, ['package.xml']),
+    ],
     entry_points={
         'console_scripts': [
             'run_mission = flywheel_missions.mission_launcher:main',
