@@ -133,3 +133,13 @@
 {"cycle": 17, "lesson": "Implement a goal prioritization mechanism to ensure goals are visited during the mission."}
 {"cycle": 17, "lesson": "Optimize the state machine transitions and recovery logic to reduce time spent in non-productive states."}
 {"cycle": 17, "lesson": "Adjust the waypoint generation strategy to improve coverage efficiency and ensure all areas are visited."}
+{"cycle": 18, "lesson": "Incorporate goal positions into the waypoint generation to ensure goals are visited."}
+{"cycle": 18, "lesson": "Implement a time management strategy to avoid mission timeout."}
+{"cycle": 18, "lesson": "Optimize path planning to improve efficiency and ensure goals are prioritized."}
+{"cycle": 18, "lesson": "Enhance the coverage strategy to ensure complete area coverage within the time constraints."}
+{"cycle": 19, "lesson": "Incorporate goal locations into the waypoint generation to ensure goals are prioritized."}
+{"cycle": 19, "lesson": "Optimize the obstacle avoidance and recovery logic to reduce time spent in these states."}
+{"cycle": 19, "lesson": "Adjust the lawnmower pattern to better fit the arena dimensions, potentially by using dynamic path planning."}
+{"cycle": 20, "lesson": "Incorporate goal prioritization into the waypoint navigation logic to ensure goals are visited."}
+{"cycle": 20, "lesson": "Optimize the path planning algorithm to reduce redundancy and improve efficiency in completing the mission within the time limit."}
+{"cycle": 20, "lesson": "Expand the waypoint generation logic to ensure full coverage of the arena, and adjust the mission termination conditions to allow more time if necessary."}

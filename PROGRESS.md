@@ -14,6 +14,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 | 7 | **32.8** | 58 | 56.5m | 0 | 0 |
 | 13 | **33.1** | 60 | 58.5m | 0 | 0 |
 | 17 | **43.5** | 133 | 118.7m | 0 | 0 |
+| 20 | **44.9** | 143 | 121.5m | 0 | 0 |
 
 ## What the Robot is Learning
 
@@ -24,6 +25,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 
 
 
+
 #
 #
 #
@@ -31,24 +33,25 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 #
 #
 #
-### Cycle 17 (Score: 43.5)
+#
+### Cycle 20 (Score: 44.9)
 
 **What worked:**
-- The robot avoided collisions successfully, achieving a collision_score of 100.
-- The robot's recovery and obstacle avoidance mechanisms prevented crashes, as indicated by the 'crashed' flag being false.
+- The robot successfully avoided collisions, achieving a collision_score of 100.
+- The robot was able to execute the lawnmower pattern without crashing, as indicated by 'crashed' being false.
 
 **What didn't work:**
-- The robot did not visit any goals, achieving a goals_score of 0.0.
-- The mission timed out, indicating inefficiency in task completion.
-- The robot did not achieve full coverage, visiting only 133 cells out of a target of 350.
+- The robot failed to visit any of the 5 goals, resulting in a goals_score of 0.0.
+- The robot timed out without completing the mission, as indicated by the 'timed_out' flag being true.
+- The coverage score was only 40.9, indicating that the robot did not cover a significant portion of the arena.
 
 **Root causes:**
-- The waypoint navigation strategy did not prioritize goal locations, leading to a lack of goal visits.
-- The robot's state machine and recovery logic consumed excessive time, contributing to the mission timeout.
+- The waypoint navigation logic did not prioritize goal locations, leading to zero goals being visited.
+- The mission timed out due to inefficient path planning and possibly redundant waypoint loops.
 
 **Lessons learned:**
-- Implement a goal prioritization mechanism to ensure goals are visited during the mission.
-- Optimize the state machine transitions and recovery logic to reduce time spent in non-productive states.
-- Adjust the waypoint generation strategy to improve coverage efficiency and ensure all areas are visited.
+- Incorporate goal prioritization into the waypoint navigation logic to ensure goals are visited.
+- Optimize the path planning algorithm to reduce redundancy and improve efficiency in completing the mission within the time limit.
+- Expand the waypoint generation logic to ensure full coverage of the arena, and adjust the mission termination conditions to allow more time if necessary.
 
-**Cells covered: 133/350** (38% of arena)
+**Cells covered: 143/350** (40% of arena)

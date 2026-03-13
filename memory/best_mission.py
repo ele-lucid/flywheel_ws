@@ -14,7 +14,7 @@ class LawnMowerMission(BaseMission):
 
     def generate_waypoints(self):
         self.waypoints = []
-        for y in range(-9, 10, 1):
+        for y in range(-9, 10):
             if y % 2 == 0:
                 for x in range(-9, 10):
                     self.waypoints.append((x, y))
