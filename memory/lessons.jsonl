@@ -97,3 +97,6 @@
 {"cycle": 6, "lesson": "Incorporate goal locations into the waypoint generation to ensure goals are visited."}
 {"cycle": 6, "lesson": "Improve the efficiency of the state machine by optimizing recovery and obstacle avoidance strategies."}
 {"cycle": 6, "lesson": "Adjust velocity parameters to enhance path efficiency and reduce mission duration."}
+{"cycle": 7, "lesson": "Integrate goal locations into the waypoint generation to ensure goals are prioritized in the path."}
+{"cycle": 7, "lesson": "Enhance the state machine to dynamically adjust strategies based on time constraints and proximity to goals."}
+{"cycle": 7, "lesson": "Optimize the lawnmower pattern or consider alternative path planning strategies that balance coverage with goal acquisition."}
