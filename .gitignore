@@ -1,0 +1,17 @@
+# Runtime artifacts
+logs/
+memory/*.jsonl
+memory/best_mission.py
+src/flywheel_missions/flywheel_missions/generated/mission_v[0-9]*.py
+!src/flywheel_missions/flywheel_missions/generated/mission_v001.py
+flywheel.env
+metrics.csv
+
+# Build artifacts
+build/
+install/
+log/
+__pycache__/
+*.pyc
+*.egg-info/
+.vscode/

@@ -1,0 +1,9 @@
+Given the current world state and past lessons, produce a specific mission plan.
+
+Address:
+1. Which goals to visit and in what order (nearest-first, or strategic routing)
+2. Navigation strategy for each leg
+3. How to handle obstacles (reactive avoidance, wall-following, gap detection)
+4. What to improve from the last attempt
+
+Be concise: 3-5 sentences.

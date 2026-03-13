@@ -1,0 +1,11 @@
+Analyze this completed mission. The robot attempted to navigate an arena with obstacles and reach goal markers.
+
+Identify:
+1. What went wrong (failure modes)
+2. What worked well (success factors)
+3. Root causes of failures
+4. Specific, actionable lessons for the next iteration
+5. Recommended strategy change
+
+Be specific: reference actual positions, distances, and timing from the logs.
+Respond with ONLY valid JSON.

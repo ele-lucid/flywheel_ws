@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>flywheel_orchestrator</name>
+  <version>0.1.0</version>
+  <description>The flywheel agent brain: perceive, reason, act, learn</description>
+  <maintainer email="aashur@lucidbots.com">Andrew Ashur</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
