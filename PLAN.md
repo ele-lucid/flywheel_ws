@@ -1,9 +1,18 @@
 # Flywheel: Self-Improving Robot Learning System - Master Plan
 
-**Version:** 3.0 (Final)
+**Version:** 3.1 (Post Eng Review)
 **Date:** 2026-03-13
 **Author:** Andrew Ashur / Lucid Bots
 **Status:** READY FOR IMPLEMENTATION
+
+### Engineering Review Decisions (2026-03-13)
+1. **Reset mechanism:** ROS2 service (not topic) for guaranteed delivery
+2. **Pose reset:** Subprocess + pose verification loop (retry once if not at origin)
+3. **Spin loop:** Lives in orchestrator, MissionRunner stays clean/testable
+4. **Goal constants:** Shared constants module (flywheel_common/constants.py)
+5. **Fatal errors:** AuthenticationError and RuntimeError propagate through broad catch
+6. **Atomic writes:** LessonStore uses write-to-temp-then-rename
+7. **Tests expanded:** 9 additional test cases for plan-introduced codepaths (~58 total)
 
 ---
 
