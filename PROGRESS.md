@@ -10,33 +10,36 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 | 2 | **33.6** | 64 | 82.2m | 0 | 0 |
 | 3 | **27.2** | 19 | 115.6m | 0 | 0 |
 | 5 | **29.8** | 37 | 51.9m | 0 | 0 |
+| 6 | **31.9** | 52 | 55.1m | 0 | 0 |
 
 ## What the Robot is Learning
 
 
 
 
+
 #
 #
 #
-### Cycle 5 (Score: 29.8)
+#
+### Cycle 6 (Score: 31.9)
 
 **What worked:**
-- The robot avoided collisions effectively, achieving a collision_score of 100 and a collision_count of 0.
-- The robot completed the mission without crashing, as indicated by the crashed flag being false.
+- The robot successfully avoided collisions, achieving a collision_score of 100.
+- The robot covered 52 cells, contributing to a coverage_score of 14.9.
 
 **What didn't work:**
 - The robot did not visit any of the 5 goals, resulting in a goals_score of 0.0.
-- The mission timed out without achieving full coverage, as indicated by the timed_out flag being true and coverage_score being only 10.6.
-- The robot's efficiency was poor, with an efficiency_score of 0, indicating excessive wandering or inefficient path planning.
+- The robot timed out before completing the mission, as indicated by 'timed_out': true.
+- The robot's efficiency score was 0, indicating inefficient path planning or execution.
 
 **Root causes:**
-- The waypoint generation strategy did not align with the goal locations, leading to a failure to visit any goals.
-- The coverage strategy was inefficient, as the robot only visited 37 cells out of a possible 350, and the mission timed out.
+- The waypoint generation did not account for goal locations, leading to no goals being visited.
+- The robot's state machine and recovery mechanisms were inefficient, causing the mission to time out.
 
 **Lessons learned:**
-- Incorporate goal locations into the waypoint generation process to ensure that all goals are visited.
-- Improve the coverage strategy by dynamically adjusting waypoints based on unvisited areas to increase coverage efficiency.
-- Optimize path planning algorithms to reduce total distance traveled and increase efficiency.
+- Incorporate goal locations into the waypoint generation to ensure goals are visited.
+- Improve the efficiency of the state machine by optimizing recovery and obstacle avoidance strategies.
+- Adjust velocity parameters to enhance path efficiency and reduce mission duration.
 
-**Cells covered: 37/350** (10% of arena)
+**Cells covered: 52/350** (14% of arena)

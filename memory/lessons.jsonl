@@ -94,3 +94,6 @@
 {"cycle": 5, "lesson": "Incorporate goal locations into the waypoint generation process to ensure that all goals are visited."}
 {"cycle": 5, "lesson": "Improve the coverage strategy by dynamically adjusting waypoints based on unvisited areas to increase coverage efficiency."}
 {"cycle": 5, "lesson": "Optimize path planning algorithms to reduce total distance traveled and increase efficiency."}
+{"cycle": 6, "lesson": "Incorporate goal locations into the waypoint generation to ensure goals are visited."}
+{"cycle": 6, "lesson": "Improve the efficiency of the state machine by optimizing recovery and obstacle avoidance strategies."}
+{"cycle": 6, "lesson": "Adjust velocity parameters to enhance path efficiency and reduce mission duration."}
