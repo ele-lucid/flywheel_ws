@@ -120,3 +120,16 @@
 {"cycle": 13, "lesson": "Integrate goal prioritization into the waypoint navigation to ensure goals are visited."}
 {"cycle": 13, "lesson": "Implement a time management strategy that dynamically adjusts the mission plan to avoid timeouts."}
 {"cycle": 13, "lesson": "Optimize the coverage pattern to improve efficiency and increase the coverage score."}
+{"cycle": 14, "lesson": "Integrate goal location data into the waypoint generation to ensure goals are visited."}
+{"cycle": 14, "lesson": "Optimize the path planning algorithm to improve efficiency and reduce mission duration."}
+{"cycle": 14, "lesson": "Enhance the coverage strategy to ensure more cells are visited within the time limit."}
+{"cycle": 15, "lesson": "Incorporate goal prioritization in waypoint generation to ensure goals are visited."}
+{"cycle": 15, "lesson": "Implement a time-check mechanism in the state machine to ensure timely completion of tasks."}
+{"cycle": 15, "lesson": "Optimize velocity and steering logic to improve path efficiency and reduce mission duration."}
+{"cycle": 16, "lesson": "Incorporate goal locations into the waypoint generation to ensure goals are visited."}
+{"cycle": 16, "lesson": "Optimize the state machine transitions, especially the 'RECOVER' state, to minimize time spent in non-productive states."}
+{"cycle": 16, "lesson": "Improve the velocity control logic to enhance path efficiency and reduce mission time."}
+{"cycle": 16, "lesson": "Adjust the lawnmower pattern to increase coverage and ensure more cells are visited."}
+{"cycle": 17, "lesson": "Implement a goal prioritization mechanism to ensure goals are visited during the mission."}
+{"cycle": 17, "lesson": "Optimize the state machine transitions and recovery logic to reduce time spent in non-productive states."}
+{"cycle": 17, "lesson": "Adjust the waypoint generation strategy to improve coverage efficiency and ensure all areas are visited."}

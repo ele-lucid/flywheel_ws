@@ -13,6 +13,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 | 6 | **31.9** | 52 | 55.1m | 0 | 0 |
 | 7 | **32.8** | 58 | 56.5m | 0 | 0 |
 | 13 | **33.1** | 60 | 58.5m | 0 | 0 |
+| 17 | **43.5** | 133 | 118.7m | 0 | 0 |
 
 ## What the Robot is Learning
 
@@ -22,29 +23,32 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 
 
 
+
 #
 #
 #
 #
 #
 #
-### Cycle 13 (Score: 33.1)
+#
+### Cycle 17 (Score: 43.5)
 
 **What worked:**
-- The robot did not collide with any obstacles, achieving a perfect collision score of 100.
+- The robot avoided collisions successfully, achieving a collision_score of 100.
+- The robot's recovery and obstacle avoidance mechanisms prevented crashes, as indicated by the 'crashed' flag being false.
 
 **What didn't work:**
-- The robot failed to visit any of the 5 goals.
-- The robot timed out before completing the mission.
-- The robot only covered 17.1% of the area, visiting 60 cells out of a target of 350.
+- The robot did not visit any goals, achieving a goals_score of 0.0.
+- The mission timed out, indicating inefficiency in task completion.
+- The robot did not achieve full coverage, visiting only 133 cells out of a target of 350.
 
 **Root causes:**
-- The waypoint navigation strategy did not prioritize goal locations, leading to zero goals being visited.
-- The robot's state machine did not handle time management effectively, resulting in a timeout.
+- The waypoint navigation strategy did not prioritize goal locations, leading to a lack of goal visits.
+- The robot's state machine and recovery logic consumed excessive time, contributing to the mission timeout.
 
 **Lessons learned:**
-- Integrate goal prioritization into the waypoint navigation to ensure goals are visited.
-- Implement a time management strategy that dynamically adjusts the mission plan to avoid timeouts.
-- Optimize the coverage pattern to improve efficiency and increase the coverage score.
+- Implement a goal prioritization mechanism to ensure goals are visited during the mission.
+- Optimize the state machine transitions and recovery logic to reduce time spent in non-productive states.
+- Adjust the waypoint generation strategy to improve coverage efficiency and ensure all areas are visited.
 
-**Cells covered: 60/350** (17% of arena)
+**Cells covered: 133/350** (38% of arena)
