@@ -19,6 +19,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 | 66 | **59.6** | 211 | 199.8m | 0 | 0 |
 | 71 | **73.6** | 309 | 276.1m | 0 | 0 |
 | 110 | **74.1** | 312 | 297.0m | 0 | 0 |
+| 124 | **74.2** | 313 | 312.1m | 0 | 0 |
 
 ## What the Robot is Learning
 
@@ -34,6 +35,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 
 
 
+
 #
 #
 #
@@ -46,23 +48,24 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 #
 #
 #
-### Cycle 110 (Score: 74.1)
+#
+### Cycle 124 (Score: 74.2)
 
 **What worked:**
-- The robot achieved a collision_score of 100, indicating no collisions occurred.
-- The robot visited 312 cells, achieving a coverage_score of 89.1.
+- The robot had zero collisions, resulting in a collision_score of 100.
+- The robot covered 313 cells, achieving a coverage_score of 89.4.
 
 **What didn't work:**
-- The robot did not visit any goals, resulting in a goals_score of 0.0.
-- The mission timed out, achieving only 30% completion.
+- No goals were visited, resulting in a goals_score of 0.0.
+- The mission timed out at 302.1 seconds, leading to a completion_score of 30.
 
 **Root causes:**
-- The waypoint navigation logic in 'build_waypoints' does not prioritize goal coordinates, leading to no goals being visited.
-- The condition 'if len(self.visited_cells) >= 320 or self.elapsed_time() > 290:' triggers a premature mission completion, limiting time to visit goals.
+- The waypoint navigation logic does not prioritize goal locations, as goals are only added if they are within 1.5m of the current row in 'build_waypoints'.
+- The robot's state machine does not have a mechanism to prioritize or revisit unvisited goals, leading to a lack of goal visits.
 
 **Lessons learned:**
-- Modify 'build_waypoints' to ensure goals are prioritized by inserting them directly at the start of the waypoint list.
-- Adjust the mission timeout condition to 'self.elapsed_time() > 350' to allow more time for goal visits.
-- Add a check in 'execute' to prioritize moving to the nearest unvisited goal if within 5.0m, before continuing with waypoint navigation.
+- Modify the 'build_waypoints' method to always include goals as waypoints, regardless of their distance to the current row, ensuring all goals are visited.
+- Introduce a goal prioritization mechanism in the state machine to periodically check and navigate to the nearest unvisited goal.
+- Adjust the timeout condition in 'execute' to check for time elapsed more frequently, ensuring the mission completes before 290 seconds.
 
-**Cells covered: 312/350** (89% of arena)
+**Cells covered: 313/350** (89% of arena)

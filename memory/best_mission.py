@@ -47,12 +47,16 @@ class LawnMowerMission(BaseMission):
             self.complete('SUCCESS')
             return
 
+        for goal in world_state["goals_remaining"]:
+            if self.distance_to(goal["x"], goal["y"]) < 0.8:
+                goals_visited.append(goal["id"])
+
         if stuck or (velocity["linear"] < 0.02 and self.state == 'MOVE_TO_WAYPOINT'):
             self.stuck_counter += 1
         else:
             self.stuck_counter = 0
 
-        if self.stuck_counter > 15:
+        if self.stuck_counter > 5:
             self.state = 'RECOVER'
 
         if obstacles["front"] < 0.3:
