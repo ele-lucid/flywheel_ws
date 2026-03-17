@@ -13,14 +13,18 @@ class LawnMowerMission(BaseMission):
         self.generate_waypoints()
 
     def generate_waypoints(self):
-        self.waypoints = []
+        self.waypoints = [
+            (5, 5), (0, -3), (-5, -5), (7, -7), (-8, 7)
+        ]
         for y in range(-9, 10):
             if y % 2 == 0:
                 for x in range(-9, 10):
-                    self.waypoints.append((x, y))
+                    if (x, y) not in self.waypoints:
+                        self.waypoints.append((x, y))
             else:
                 for x in range(9, -10, -1):
-                    self.waypoints.append((x, y))
+                    if (x, y) not in self.waypoints:
+                        self.waypoints.append((x, y))
 
     def execute(self):
         world_state = self.get_world_state()
@@ -38,17 +42,17 @@ class LawnMowerMission(BaseMission):
         self.visited_cells.add(current_cell)
 
         # Check for coverage completion
-        if len(self.visited_cells) >= 350 or self.elapsed_time() > 85:
+        if len(self.visited_cells) >= 320 or self.elapsed_time() > 110:
             self.complete('SUCCESS')
             return
 
         # Stuck detection
-        if stuck or (velocity["linear"] < 0.01 and self.state == 'MOVE_TO_WAYPOINT'):
+        if stuck or (velocity["linear"] < 0.005 and self.state == 'MOVE_TO_WAYPOINT'):
             self.stuck_counter += 1
         else:
             self.stuck_counter = 0
 
-        if self.stuck_counter > 20:
+        if self.stuck_counter > 15:
             self.state = 'RECOVER'
 
         # Obstacle avoidance
@@ -56,28 +60,24 @@ class LawnMowerMission(BaseMission):
             self.stop()
             self.state = 'AVOID_OBSTACLE'
             self.avoid_counter = 0
-        elif obstacles["front"] < 0.6:
+        elif obstacles["front"] < 0.5:
             steer = 0.2 if obstacles["front_left"] < obstacles["front_right"] else -0.2
             self.move(linear=0.2, angular=steer)
-            return
-        elif obstacles["left"] < 0.4:
-            self.move(linear=0.5, angular=-0.2)
-            return
-        elif obstacles["right"] < 0.4:
-            self.move(linear=0.5, angular=0.2)
             return
 
         # State machine
         if self.state == 'MOVE_TO_WAYPOINT':
+            if self.current_waypoint_index >= len(self.waypoints):
+                self.complete('SUCCESS')
+                return
+
             waypoint = self.waypoints[self.current_waypoint_index]
             target_x, target_y = waypoint
             heading_error = self.heading_to(target_x, target_y)
-            angular = max(min(heading_error * 0.03, 0.5), -0.5)
+            angular = max(min(heading_error * 0.05, 1.0), -1.0)
 
-            if self.distance_to(target_x, target_y) < 0.1:
+            if self.distance_to(target_x, target_y) < 1.0:
                 self.current_waypoint_index += 1
-                if self.current_waypoint_index >= len(self.waypoints):
-                    self.current_waypoint_index = 0  # Loop waypoints
 
             self.move(linear=0.5, angular=angular)
 

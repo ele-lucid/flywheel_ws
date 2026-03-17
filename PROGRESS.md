@@ -15,6 +15,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 | 13 | **33.1** | 60 | 58.5m | 0 | 0 |
 | 17 | **43.5** | 133 | 118.7m | 0 | 0 |
 | 20 | **44.9** | 143 | 121.5m | 0 | 0 |
+| 62 | **54.9** | 178 | 158.9m | 0 | 0 |
 
 ## What the Robot is Learning
 
@@ -26,6 +27,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 
 
 
+
 #
 #
 #
@@ -34,24 +36,25 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 #
 #
 #
-### Cycle 20 (Score: 44.9)
+#
+### Cycle 62 (Score: 54.9)
 
 **What worked:**
-- The robot successfully avoided collisions, achieving a collision_score of 100.
-- The robot was able to execute the lawnmower pattern without crashing, as indicated by 'crashed' being false.
+- No collisions occurred, resulting in a collision_score of 100.
+- High efficiency with a total distance of 158.95 meters and efficiency_score of 100.
 
 **What didn't work:**
-- The robot failed to visit any of the 5 goals, resulting in a goals_score of 0.0.
-- The robot timed out without completing the mission, as indicated by the 'timed_out' flag being true.
-- The coverage score was only 40.9, indicating that the robot did not cover a significant portion of the arena.
+- The robot did not visit any goals, resulting in a goals_score of 0.0.
+- Coverage was only 50.9%, with 178 cells visited out of 350 reachable cells.
+- The mission timed out at 122.1 seconds, earning only 30/100 completion score.
 
 **Root causes:**
-- The waypoint navigation logic did not prioritize goal locations, leading to zero goals being visited.
-- The mission timed out due to inefficient path planning and possibly redundant waypoint loops.
+- Waypoints were generated without prioritizing goal locations, leading to missed goals.
+- The coverage logic terminates at 320 cells or 110 seconds, but only 178 cells were visited within the timeout.
 
 **Lessons learned:**
-- Incorporate goal prioritization into the waypoint navigation logic to ensure goals are visited.
-- Optimize the path planning algorithm to reduce redundancy and improve efficiency in completing the mission within the time limit.
-- Expand the waypoint generation logic to ensure full coverage of the arena, and adjust the mission termination conditions to allow more time if necessary.
+- Insert goal (5,5) as a waypoint between row y=4 and y=5, and goal (-8,7) between row y=6 and y=7, to visit goals during coverage without detours.
+- Increase the coverage completion threshold from 320 to 350 cells to ensure full arena coverage.
+- Adjust the timeout threshold from 110 seconds to 140 seconds to allow more time for goal visits and coverage.
 
-**Cells covered: 143/350** (40% of arena)
+**Cells covered: 178/350** (50% of arena)
