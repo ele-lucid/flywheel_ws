@@ -15,17 +15,7 @@ class LawnMowerMission(BaseMission):
     def build_waypoints(self):
         wps = []
         goals = [(5, 5), (-5, -5), (7, -7), (-8, 7), (0, -3)]
-        for row, y in enumerate(range(0, 10)):
-            for gx, gy in goals:
-                if abs(gy - y) < 1.5:
-                    wps.append((gx, gy))
-            if row % 2 == 0:
-                wps.append((-9.0, float(y)))
-                wps.append((9.0, float(y)))
-            else:
-                wps.append((9.0, float(y)))
-                wps.append((-9.0, float(y)))
-        for row, y in enumerate(range(-1, -10, -1)):
+        for row, y in enumerate(range(-9, 10)):
             for gx, gy in goals:
                 if abs(gy - y) < 1.5:
                     wps.append((gx, gy))
@@ -62,7 +52,7 @@ class LawnMowerMission(BaseMission):
         else:
             self.stuck_counter = 0
 
-        if self.stuck_counter > 5:
+        if self.stuck_counter > 15:
             self.state = 'RECOVER'
 
         if obstacles["front"] < 0.3:
@@ -99,10 +89,11 @@ class LawnMowerMission(BaseMission):
 
         elif self.state == 'RECOVER':
             if self.recover_counter < 10:
-                self.move(linear=-0.15)
+                self.move(linear=-0.3)
             elif self.recover_counter < 25:
-                self.move(angular=0.8)
+                self.move(angular=1.2)
             else:
                 self.state = 'MOVE_TO_WAYPOINT'
                 self.recover_counter = 0
+                self.current_waypoint_index += 1
             self.recover_counter += 1

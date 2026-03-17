@@ -18,6 +18,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 | 62 | **54.9** | 178 | 158.9m | 0 | 0 |
 | 66 | **59.6** | 211 | 199.8m | 0 | 0 |
 | 71 | **73.6** | 309 | 276.1m | 0 | 0 |
+| 110 | **74.1** | 312 | 297.0m | 0 | 0 |
 
 ## What the Robot is Learning
 
@@ -32,6 +33,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 
 
 
+
 #
 #
 #
@@ -43,23 +45,24 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 #
 #
 #
-### Cycle 71 (Score: 73.6)
+#
+### Cycle 110 (Score: 74.1)
 
 **What worked:**
-- The robot achieved 100% collision avoidance, with a collision count of 0.
-- The robot maintained high efficiency, covering 309 cells with a total distance of 276.08 meters.
+- The robot achieved a collision_score of 100, indicating no collisions occurred.
+- The robot visited 312 cells, achieving a coverage_score of 89.1.
 
 **What didn't work:**
-- No goals were visited during the mission despite having 5 goals to achieve.
-- The mission timed out after 302.09 seconds, achieving only 30% completion.
+- The robot did not visit any goals, resulting in a goals_score of 0.0.
+- The mission timed out, achieving only 30% completion.
 
 **Root causes:**
-- The code does not prioritize visiting goals, as the waypoint logic only checks if goals are within 1.5m of the current row, which is insufficient given the goals' locations.
-- The mission logic prematurely completes the mission if 320 cells are visited or time exceeds 290 seconds, which does not align with the actual mission timeout at 302.09 seconds.
+- The waypoint navigation logic in 'build_waypoints' does not prioritize goal coordinates, leading to no goals being visited.
+- The condition 'if len(self.visited_cells) >= 320 or self.elapsed_time() > 290:' triggers a premature mission completion, limiting time to visit goals.
 
 **Lessons learned:**
-- Incorporate goal prioritization by explicitly adding goals as waypoints with a higher priority than coverage waypoints.
-- Increase the waypoint reach threshold from 1.0m to 2.0m to ensure goals are reached, as the current threshold is not sufficient for goal proximity.
-- Adjust the mission completion condition to check for actual mission timeout at 302.09 seconds instead of 290 seconds.
+- Modify 'build_waypoints' to ensure goals are prioritized by inserting them directly at the start of the waypoint list.
+- Adjust the mission timeout condition to 'self.elapsed_time() > 350' to allow more time for goal visits.
+- Add a check in 'execute' to prioritize moving to the nearest unvisited goal if within 5.0m, before continuing with waypoint navigation.
 
-**Cells covered: 309/350** (88% of arena)
+**Cells covered: 312/350** (89% of arena)
