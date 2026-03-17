@@ -10,21 +10,23 @@ class LawnMowerMission(BaseMission):
         self.stuck_counter = 0
         self.avoid_counter = 0
         self.recover_counter = 0
-        self.generate_waypoints()
+        self.waypoints = self.build_waypoints()
 
-    def generate_waypoints(self):
-        self.waypoints = [
-            (5, 5), (0, -3), (-5, -5), (7, -7), (-8, 7)
-        ]
-        for y in range(-9, 10):
-            if y % 2 == 0:
-                for x in range(-9, 10):
-                    if (x, y) not in self.waypoints:
-                        self.waypoints.append((x, y))
+    def build_waypoints(self):
+        wps = []
+        goals = [(5, 5), (-5, -5), (7, -7), (-8, 7), (0, -3)]
+        for row, y in enumerate(range(-9, 10)):
+            for gx, gy in goals:
+                if abs(gy - y) < 1.5:
+                    wps.append((gx, gy))
+            if row % 2 == 0:
+                wps.append((-9.0, float(y)))
+                wps.append((9.0, float(y)))
             else:
-                for x in range(9, -10, -1):
-                    if (x, y) not in self.waypoints:
-                        self.waypoints.append((x, y))
+                wps.append((9.0, float(y)))
+                wps.append((-9.0, float(y)))
+        wps.extend([(9, 9), (-9, 9), (-9, -9), (9, -9)])
+        return wps
 
     def execute(self):
         world_state = self.get_world_state()
@@ -37,35 +39,29 @@ class LawnMowerMission(BaseMission):
         obstacles = world_state["obstacles"]
         stuck = world_state["stuck"]
 
-        # Track visited cells
         current_cell = (math.floor(current_x), math.floor(current_y))
         self.visited_cells.add(current_cell)
 
-        # Check for coverage completion
-        if len(self.visited_cells) >= 320 or self.elapsed_time() > 110:
+        if len(self.visited_cells) >= 320 or self.elapsed_time() > 170:
             self.complete('SUCCESS')
             return
 
-        # Stuck detection
-        if stuck or (velocity["linear"] < 0.005 and self.state == 'MOVE_TO_WAYPOINT'):
+        if stuck or (velocity["linear"] < 0.02 and self.state == 'MOVE_TO_WAYPOINT'):
             self.stuck_counter += 1
         else:
             self.stuck_counter = 0
 
-        if self.stuck_counter > 15:
+        if self.stuck_counter > 5:
             self.state = 'RECOVER'
 
-        # Obstacle avoidance
         if obstacles["front"] < 0.3:
-            self.stop()
             self.state = 'AVOID_OBSTACLE'
             self.avoid_counter = 0
         elif obstacles["front"] < 0.5:
-            steer = 0.2 if obstacles["front_left"] < obstacles["front_right"] else -0.2
-            self.move(linear=0.2, angular=steer)
+            steer = 0.8 if obstacles["front_left"] < obstacles["front_right"] else -0.8
+            self.move(linear=0.3, angular=steer)
             return
 
-        # State machine
         if self.state == 'MOVE_TO_WAYPOINT':
             if self.current_waypoint_index >= len(self.waypoints):
                 self.complete('SUCCESS')
@@ -83,18 +79,18 @@ class LawnMowerMission(BaseMission):
 
         elif self.state == 'AVOID_OBSTACLE':
             self.avoid_counter += 1
-            if self.avoid_counter <= 15:
+            if self.avoid_counter <= 10:
                 self.move(linear=-0.15)
-            elif self.avoid_counter <= 30:
-                self.move(linear=0.15, angular=0.6)
+            elif self.avoid_counter <= 25:
+                self.move(linear=0.15, angular=0.8)
             else:
                 self.state = 'MOVE_TO_WAYPOINT'
 
         elif self.state == 'RECOVER':
-            if self.recover_counter < 20:
+            if self.recover_counter < 10:
                 self.move(linear=-0.15)
-            elif self.recover_counter < 40:
-                self.move(angular=0.3)
+            elif self.recover_counter < 25:
+                self.move(angular=0.8)
             else:
                 self.state = 'MOVE_TO_WAYPOINT'
                 self.recover_counter = 0
