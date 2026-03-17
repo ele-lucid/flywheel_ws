@@ -15,7 +15,17 @@ class LawnMowerMission(BaseMission):
     def build_waypoints(self):
         wps = []
         goals = [(5, 5), (-5, -5), (7, -7), (-8, 7), (0, -3)]
-        for row, y in enumerate(range(-9, 10)):
+        for row, y in enumerate(range(0, 10)):
+            for gx, gy in goals:
+                if abs(gy - y) < 1.5:
+                    wps.append((gx, gy))
+            if row % 2 == 0:
+                wps.append((-9.0, float(y)))
+                wps.append((9.0, float(y)))
+            else:
+                wps.append((9.0, float(y)))
+                wps.append((-9.0, float(y)))
+        for row, y in enumerate(range(-1, -10, -1)):
             for gx, gy in goals:
                 if abs(gy - y) < 1.5:
                     wps.append((gx, gy))
@@ -38,11 +48,12 @@ class LawnMowerMission(BaseMission):
         velocity = world_state["velocity"]
         obstacles = world_state["obstacles"]
         stuck = world_state["stuck"]
+        goals_visited = world_state["goals_visited"]
 
         current_cell = (math.floor(current_x), math.floor(current_y))
         self.visited_cells.add(current_cell)
 
-        if len(self.visited_cells) >= 320 or self.elapsed_time() > 170:
+        if len(self.visited_cells) >= 320 or self.elapsed_time() > 290:
             self.complete('SUCCESS')
             return
 
