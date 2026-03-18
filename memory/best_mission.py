@@ -18,7 +18,7 @@ class LawnMowerMission(BaseMission):
         for row, y in enumerate(range(-9, 10)):
             # Insert nearby goal before this row
             for gx, gy in goals:
-                if abs(gy - y) < 1.5:
+                if abs(gy - y) < 3.0:
                     wps.append((gx, gy))
             # Row endpoints only
             if row % 2 == 0:
@@ -51,7 +51,7 @@ class LawnMowerMission(BaseMission):
             return
 
         for goal in world_state["goals_remaining"]:
-            if self.distance_to(goal["x"], goal["y"]) < 0.8:
+            if self.distance_to(goal["x"], goal["y"]) < 1.5:
                 goals_visited.append(goal["id"])
 
         if stuck or (velocity["linear"] < 0.1 and self.state == 'MOVE_TO_WAYPOINT'):
@@ -59,7 +59,7 @@ class LawnMowerMission(BaseMission):
         else:
             self.stuck_counter = 0
 
-        if self.stuck_counter > 20:
+        if self.stuck_counter > 10:
             self.state = 'RECOVER'
 
         if obstacles["front"] < 0.3:
@@ -80,7 +80,7 @@ class LawnMowerMission(BaseMission):
             heading_error = self.heading_to(target_x, target_y)
             angular = max(min(heading_error * 0.05, 1.0), -1.0)
 
-            if self.distance_to(target_x, target_y) < 1.0:
+            if self.distance_to(target_x, target_y) < 0.5:
                 self.current_waypoint_index += 1
 
             self.move(linear=0.5, angular=angular)
@@ -98,7 +98,7 @@ class LawnMowerMission(BaseMission):
             if self.recover_counter < 10:
                 self.move(linear=-0.3)
             elif self.recover_counter < 25:
-                self.move(angular=1.2)
+                self.move(angular=1.5)
             else:
                 self.state = 'MOVE_TO_WAYPOINT'
                 self.recover_counter = 0

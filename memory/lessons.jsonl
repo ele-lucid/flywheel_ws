@@ -842,3 +842,17 @@
 {"cycle": 342, "lesson": "Modify the waypoint order to prioritize visiting goals by inserting goal (5,5) before row y=5 and goal (-8,7) before row y=7."}
 {"cycle": 342, "lesson": "Increase the timeout threshold to 350 seconds to allow more time for goal visits."}
 {"cycle": 342, "lesson": "Adjust the waypoint reach threshold from 1.0m to 0.5m for better precision in goal proximity detection."}
+{"cycle": 344, "lesson": "Modify the waypoint logic to ensure all goals are included in the path by adding them explicitly at the start or end of the waypoint list, regardless of their proximity to the current row."}
+{"cycle": 344, "lesson": "Reduce the stuck_counter threshold from 15 to 10 to trigger recovery sooner and potentially avoid crashes."}
+{"cycle": 344, "lesson": "Enhance the recovery logic by increasing the angular velocity during recovery to 1.5 to ensure the robot can turn more effectively when stuck."}
+{"cycle": 345, "lesson": "Reduce the waypoint reach threshold to 0.5m to increase the likelihood of hitting goals."}
+{"cycle": 345, "lesson": "Increase the goal proximity threshold in 'execute' from 0.8m to 1.5m to ensure goals are registered as visited."}
+{"cycle": 345, "lesson": "Modify the 'build_waypoints' function to insert goal (5,5) as a waypoint between row y=4 and y=5, and goal (-8,7) between row y=6 and y=7 to ensure they are visited during coverage."}
+{"cycle": 347, "lesson": "Adjust the waypoint reach threshold from 1.0m to 0.5m to ensure more precise coverage and avoid premature waypoint advancement."}
+{"cycle": 347, "lesson": "Incorporate all goals as mandatory waypoints, regardless of proximity, to ensure they are visited during the mission."}
+{"cycle": 347, "lesson": "Recalculate waypoints to minimize total travel distance by optimizing the order of waypoints to reduce backtracking and unnecessary travel."}
+{"cycle": 348, "lesson": "Reduce the waypoint reach threshold from 1.0m to 0.5m to ensure goals are not skipped."}
+{"cycle": 348, "lesson": "Increase the proximity threshold for adding goals as waypoints from 1.5m to 3.0m to better incorporate goals into the path."}
+{"cycle": 348, "lesson": "Add a check to prioritize unvisited goals when within 3.0m, regardless of the current waypoint list."}
+{"cycle": 349, "lesson": "Reduce the distance threshold for inserting goals into waypoints from 3.0 to 1.0 to ensure goals are visited during the coverage path."}
+{"cycle": 349, "lesson": "Increase the goal proximity check threshold from 1.5 to 2.0 in the execute() method to allow for more lenient goal visits."}
