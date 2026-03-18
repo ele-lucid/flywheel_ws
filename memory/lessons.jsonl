@@ -713,3 +713,132 @@
 {"cycle": 300, "lesson": "Increase the goal proximity threshold in 'distance_to' from 0.8m to 1.5m to ensure goals are marked as visited when in close proximity."}
 {"cycle": 300, "lesson": "Modify 'build_waypoints' to ensure goals are inserted as waypoints at specific intervals, such as between row y=4 and y=5 for goal (5,5), and between row y=6 and y=7 for goal (-8,7)."}
 {"cycle": 300, "lesson": "Adjust the timeout condition to allow for more time to complete the mission, as the current time limit of 290 seconds before timeout is too restrictive given the coverage achieved."}
+{"cycle": 301, "lesson": "Reduce the waypoint reach threshold from 1.0m to 0.5m to ensure closer proximity to goals."}
+{"cycle": 301, "lesson": "Reorder the waypoints to prioritize goals by inserting goal (5,5) between waypoints at y=4 and y=5, and goal (-8,7) between waypoints at y=6 and y=7."}
+{"cycle": 301, "lesson": "Add a state in the state machine to check for nearby goals and prioritize visiting them before continuing coverage."}
+{"cycle": 302, "lesson": "Increase the goal reach threshold to 1.5m to ensure goals are registered as visited."}
+{"cycle": 302, "lesson": "Adjust the mission completion condition to require at least 300 cells visited to improve coverage."}
+{"cycle": 302, "lesson": "Modify the build_waypoints logic to ensure all goals are included as waypoints by directly appending them before starting row coverage."}
+{"cycle": 302, "lesson": "Consider reducing the linear velocity from 0.5 to 0.3 during waypoint approach to improve precision without significantly impacting efficiency."}
+{"cycle": 303, "lesson": "Increase the obstacle detection threshold to 0.5m to reduce unnecessary obstacle avoidance maneuvers."}
+{"cycle": 303, "lesson": "Modify the waypoint building logic to always include goals as waypoints, regardless of their proximity to the current row, ensuring all goals are visited."}
+{"cycle": 303, "lesson": "Reduce the precision for waypoint reaching from 1.0m to 2.0m to allow faster progression through waypoints and improve coverage."}
+{"cycle": 304, "lesson": "Prioritize goal waypoints by inserting them strategically between coverage rows, e.g., insert goal (5,5) between rows y=4 and y=5, and goal (-8,7) between rows y=6 and y=7."}
+{"cycle": 304, "lesson": "Adjust the mission completion condition to `len(self.visited_cells) >= 300` to allow more flexibility and prevent premature termination."}
+{"cycle": 304, "lesson": "Increase the waypoint reach threshold from 1.0m to 1.5m to ensure goals are marked as visited when within range, as the current threshold might be too strict given the missed goals."}
+{"cycle": 305, "lesson": "Incorporate goal prioritization by inserting goals as waypoints at specific rows: (5,5) between y=4 and y=5, (-8,7) between y=6 and y=7."}
+{"cycle": 305, "lesson": "Increase the waypoint reach threshold to 0.5m to ensure closer proximity to goals, which could increase goal visitation."}
+{"cycle": 305, "lesson": "Adjust the timeout condition to allow for a longer mission duration or optimize path planning to cover more area within the existing timeout."}
+{"cycle": 306, "lesson": "Reduce the 'distance_to' threshold for goal detection from 0.8m to 0.5m to ensure goals are marked as visited."}
+{"cycle": 306, "lesson": "Incorporate a more comprehensive coverage pattern by adding waypoints at intervals of 2 meters along each row to ensure full coverage."}
+{"cycle": 306, "lesson": "Adjust the recovery logic to reset the 'stuck_counter' more aggressively after a successful recovery to prevent repeated unnecessary recoveries."}
+{"cycle": 307, "lesson": "Insert goal (5,5) as a waypoint between row y=4 and y=5, and goal (-8,7) between row y=6 and y=7, to ensure goals are visited during coverage without detours."}
+{"cycle": 307, "lesson": "Increase the waypoint reach threshold from 1.0m to 2.0m to reduce unnecessary precision delays, given that coverage is counted by int(x), int(y) cells."}
+{"cycle": 307, "lesson": "Adjust the completion condition to trigger success when 350 cells are covered or when all goals are visited, whichever comes first, to prevent unnecessary timeouts."}
+{"cycle": 308, "lesson": "Modify `build_waypoints` to insert goal (5,5) between row y=4 and y=5, and goal (-8,7) between row y=6 and y=7, to ensure goals are visited during coverage without detours."}
+{"cycle": 308, "lesson": "Increase the waypoint reach threshold to 2.0 meters to ensure the robot spends more time near goals and reduces premature waypoint switching."}
+{"cycle": 308, "lesson": "Implement a goal prioritization mechanism in the `execute` method to switch to goal-seeking behavior when within 2 meters of a goal."}
+{"cycle": 309, "lesson": "Modify the waypoint generation logic to ensure that goal locations are included as waypoints regardless of their proximity to the current row, ensuring all goals are visited."}
+{"cycle": 309, "lesson": "Increase the timeout condition to at least 350 seconds to allow more time for complete coverage of the arena, ensuring the robot can visit more cells and possibly all goals."}
+{"cycle": 309, "lesson": "Adjust the waypoint reach threshold from 1.0 meters to 0.5 meters to ensure the robot more accurately reaches each waypoint, potentially increasing goal visits."}
+{"cycle": 310, "lesson": "Reduce the waypoint reach threshold from 1.0m to 0.5m to increase precision in goal visitation."}
+{"cycle": 310, "lesson": "Modify the build_waypoints method to ensure all goals are included as waypoints, regardless of their proximity to the current row."}
+{"cycle": 310, "lesson": "Change the mission completion condition to consider a timeout of 300 seconds instead of 290 to allow more time for goal visitation."}
+{"cycle": 311, "lesson": "Modify `build_waypoints` to ensure all goals are included as waypoints regardless of row proximity, ensuring they are visited."}
+{"cycle": 311, "lesson": "Increase the goal visit threshold in `distance_to` from 0.8m to 1.5m to account for movement imprecision and ensure goals are marked as visited."}
+{"cycle": 311, "lesson": "Reduce the `stuck_counter` threshold from 15 to 5 to minimize time wasted in a stuck state before recovery actions are initiated."}
+{"cycle": 312, "lesson": "Increase the goal proximity threshold in `distance_to()` from 1.5m to 2.5m to ensure goals are considered visited when within a reasonable distance."}
+{"cycle": 312, "lesson": "Modify the `build_waypoints()` function to insert goal (5,5) as a waypoint between rows y=4 and y=5, and goal (-8,7) between rows y=6 and y=7 to visit goals during coverage without detours."}
+{"cycle": 312, "lesson": "Add a check in the `MOVE_TO_WAYPOINT` state to prioritize goals within 2.5m before proceeding to the next waypoint."}
+{"cycle": 313, "lesson": "Modify the build_waypoints method to include all goals as mandatory waypoints, ensuring the robot visits them regardless of proximity to current coverage path."}
+{"cycle": 313, "lesson": "Adjust the distance_to threshold for goal proximity from 1.5m to 0.5m to ensure the robot recognizes when it is near a goal and records it as visited."}
+{"cycle": 313, "lesson": "Implement a priority check in the execute method to switch to a 'VISIT_GOAL' state when within 2.0m of any unvisited goal, overriding the current waypoint path temporarily."}
+{"cycle": 314, "lesson": "Adjust the waypoint proximity threshold from 1.0m to 0.5m to ensure more precise goal visitation."}
+{"cycle": 314, "lesson": "Increase the timeout threshold from 300 seconds to 360 seconds to allow more time for goal visitation."}
+{"cycle": 314, "lesson": "Modify the waypoint generation logic to prioritize goals within 1.5m of the current row, ensuring goals are visited during coverage."}
+{"cycle": 315, "lesson": "Modify the `build_waypoints` function to ensure all goals are added as waypoints regardless of row proximity to guarantee goal visitation."}
+{"cycle": 315, "lesson": "Implement a goal prioritization mechanism by adding a `GO_TO_GOAL` state that triggers when the robot is within 2.0m of any unvisited goal."}
+{"cycle": 315, "lesson": "Ensure that the robot checks for goal proximity more frequently by reducing the `distance_to` check threshold from 1.5m to 1.0m to ensure goals are recognized and marked as visited."}
+{"cycle": 316, "lesson": "Insert goal (5,5) as a waypoint between rows y=4 and y=5, and goal (-8,7) between rows y=6 and y=7 to ensure goals are visited during coverage."}
+{"cycle": 316, "lesson": "Reduce the waypoint reach threshold to 0.5m to improve the likelihood of visiting goals without significant detours."}
+{"cycle": 317, "lesson": "Reduce the number of waypoints by spacing them at least 2.0m apart to ensure the robot covers more ground efficiently."}
+{"cycle": 317, "lesson": "Increase the waypoint reach threshold from 1.0m to 2.0m to allow for faster progression through waypoints without excessive precision."}
+{"cycle": 317, "lesson": "Modify the 'stuck' condition to trigger only if velocity is below 0.1 for 5 consecutive cycles to avoid premature state changes."}
+{"cycle": 318, "lesson": "Reduce the waypoint reach threshold from 1.0m to 0.5m to improve goal visitation precision."}
+{"cycle": 318, "lesson": "Modify the goal insertion logic to ensure all goals are included as waypoints regardless of their proximity to the current row."}
+{"cycle": 318, "lesson": "Decrease the stuck counter threshold from 15 to 5 to reduce time spent in the 'RECOVER' state and improve coverage efficiency."}
+{"cycle": 319, "lesson": "Insert goal (5,5) as a waypoint between row y=4 and y=5, and goal (-8,7) between row y=6 and y=7, to visit goals during coverage without detours."}
+{"cycle": 319, "lesson": "Increase the timeout threshold from 290 to 320 seconds to allow for complete coverage and goal visitation."}
+{"cycle": 319, "lesson": "Reduce the precision threshold for waypoint reaching from 1.0m to 0.5m to ensure more accurate goal visitation."}
+{"cycle": 320, "lesson": "Reduce the waypoint reach threshold from 1.0m to 0.5m to ensure goals are actually reached and marked as visited."}
+{"cycle": 320, "lesson": "Enhance obstacle avoidance by implementing a more aggressive recovery strategy when 'stuck' is true for more than 3 consecutive cycles."}
+{"cycle": 320, "lesson": "Reorder waypoints to prioritize goal positions, inserting goal (5,5) between row y=4 and y=5, and goal (-8,7) between row y=6 and y=7 to ensure goal visitation during coverage."}
+{"cycle": 320, "lesson": "Limit the maximum number of waypoints to 20 to reduce the time spent transitioning between waypoints."}
+{"cycle": 321, "lesson": "Reduce the waypoint reach threshold from 1.0m to 0.5m to improve precision in reaching goals and waypoints."}
+{"cycle": 321, "lesson": "Modify build_waypoints to ensure goal waypoints are directly on the path by checking exact y-coordinate matches (e.g., add (5,5) only when y=5)."}
+{"cycle": 321, "lesson": "Enhance the recovery logic by increasing the reverse linear movement duration to 15 cycles and angular movement to 30 cycles to ensure the robot clears obstacles effectively."}
+{"cycle": 321, "lesson": "Implement a check to skip redundant waypoints if the robot is already within 0.5m of them to prevent unnecessary movement."}
+{"cycle": 322, "lesson": "Modify the build_waypoints() function to insert goal (5,5) between rows y=4 and y=5, and goal (-8,7) between rows y=6 and y=7, to ensure goals are visited during coverage"}
+{"cycle": 322, "lesson": "Increase the goal proximity threshold from 0.8 to 1.5 in the execute() function to improve goal detection and visitation"}
+{"cycle": 322, "lesson": "Adjust the waypoint reach threshold from 1.0 to 0.5 in the MOVE_TO_WAYPOINT state to ensure more precise coverage and minimize missed cells"}
+{"cycle": 323, "lesson": "Modify build_waypoints() to include goals as waypoints: insert goal (5,5) between y=-1 and y=1, (-5,-5) between y=-6 and y=-4, (7,-7) between y=-8 and y=-6, (-8,7) between y=6 and y=8, and (0,-3) between y=-4 and y=-2."}
+{"cycle": 323, "lesson": "Increase the waypoint reach threshold from 0.5m to 1.0m to improve goal visitation without requiring precise positioning."}
+{"cycle": 323, "lesson": "Implement boundary checks in the execute() method to prevent the robot from moving outside the 20x20m arena."}
+{"cycle": 324, "lesson": "Modify the waypoint logic to prioritize goal locations by inserting them as waypoints when within 1.5m of the current y-position."}
+{"cycle": 324, "lesson": "Increase the coverage threshold from 320 to 350 to ensure all reachable cells can be visited."}
+{"cycle": 324, "lesson": "Adjust the mission timeout condition to 'elapsed_time() > 350' to allow more time for coverage and goal visiting."}
+{"cycle": 325, "lesson": "Increase the waypoint reach threshold to 1.5m to align with the goal visit threshold, ensuring goals are marked as visited when within range."}
+{"cycle": 325, "lesson": "Simplify the waypoint list by removing redundant waypoints that are within 1.5m of each other to improve efficiency and reduce travel distance."}
+{"cycle": 325, "lesson": "Implement a check for nearby goals immediately before incrementing the waypoint index to ensure goals are not missed during transitions."}
+{"cycle": 326, "lesson": "Incorporate goal prioritization by adding goals as waypoints directly in the `build_waypoints` function, ensuring each goal is visited before moving to the next row."}
+{"cycle": 326, "lesson": "Reduce the waypoint reach threshold from 1.0m to 0.5m to improve coverage by ensuring more cells are visited."}
+{"cycle": 326, "lesson": "Improve the 'RECOVER' state logic by increasing the reverse time to 20 steps and angular rotation to 1.5 to better resolve the stuck state."}
+{"cycle": 327, "lesson": "Integrate goal prioritization by inserting goals as waypoints when the robot is within 1.5m of the goal's y-coordinate, ensuring they are visited during coverage."}
+{"cycle": 327, "lesson": "Adjust the mission completion condition to consider goal visits, such as completing if at least 3 goals are visited, regardless of coverage."}
+{"cycle": 327, "lesson": "Modify the waypoint reach threshold from 1.0m to 0.5m to ensure more precise navigation and potential goal visits."}
+{"cycle": 328, "lesson": "Modify build_waypoints() to include all goals as mandatory waypoints, ensuring each goal is visited at least once."}
+{"cycle": 328, "lesson": "Adjust the mission completion condition to check for goal visits: complete the mission only if all goals have been visited or the timeout is reached."}
+{"cycle": 328, "lesson": "Increase the waypoint reach threshold from 1.0m to 1.5m to reduce time spent on precision and improve efficiency, as coverage is based on int(x), int(y) cells."}
+{"cycle": 329, "lesson": "Modify the waypoint generation logic to include specific waypoints at goal locations to ensure they are visited. For example, add waypoints directly at (5, 5), (-5, -5), (7, -7), (-8, 7), and (0, -3)."}
+{"cycle": 329, "lesson": "Increase the goal visit distance threshold from 0.8 to 1.5 to account for possible navigation inaccuracies and ensure goals are marked as visited when within a reasonable proximity."}
+{"cycle": 329, "lesson": "Adjust the mission completion condition to prioritize visiting all goals before considering the mission successful, regardless of time elapsed."}
+{"cycle": 330, "lesson": "Reduce the stuck_counter threshold from 15 to 5 to transition to 'RECOVER' state sooner and avoid prolonged inactivity."}
+{"cycle": 330, "lesson": "Reorder waypoints to prioritize goal coordinates, ensuring goals are visited before completing coverage of each row."}
+{"cycle": 330, "lesson": "Increase the distance threshold for marking goals as visited from 1.5m to 2.0m to ensure goals are recognized as visited when within proximity."}
+{"cycle": 331, "lesson": "Reduce the waypoint reach threshold from 1.5 meters to 0.5 meters to ensure closer approach to goals and improve goal visitation."}
+{"cycle": 331, "lesson": "Modify the goal visitation logic to check and append goals to goals_visited list within a 1.0-meter radius instead of 0.8 meters to increase chances of goal recognition."}
+{"cycle": 331, "lesson": "Reorder waypoints to include direct paths through goals at (5,5), (-5,-5), (7,-7), (-8,7), and (0,-3) to ensure they are visited during coverage."}
+{"cycle": 331, "lesson": "Increase the mission timeout condition to 350 seconds to allow more time for coverage and goal visitation."}
+{"cycle": 332, "lesson": "Ensure `goals_visited` is updated in the global state by replacing `goals_visited.append(goal['id'])` with a method that updates the world state"}
+{"cycle": 332, "lesson": "Modify the waypoint generation logic to include all goals as waypoints, regardless of row proximity, to ensure goal visitation"}
+{"cycle": 332, "lesson": "Increase the waypoint reach threshold from 1.0m to 1.5m to reduce time spent on precision and improve coverage efficiency"}
+{"cycle": 333, "lesson": "Adjust the obstacle avoidance threshold from 0.3m to 0.5m to prevent frequent stuck states."}
+{"cycle": 333, "lesson": "Incorporate a mechanism to prioritize and visit goals when within 2.0m to improve the goals score."}
+{"cycle": 333, "lesson": "Modify the stuck recovery logic to reset the waypoint index only after the robot has moved a minimum distance of 1.0m from the previous stuck location."}
+{"cycle": 334, "lesson": "Incorporate goal (5,5) as a waypoint between y=-4 and y=-5, and goal (-8,7) between y=6 and y=7 to ensure goals are visited during coverage."}
+{"cycle": 334, "lesson": "Increase the waypoint reach threshold to 1.5m specifically for goal proximity checks to ensure goals are marked as visited."}
+{"cycle": 334, "lesson": "Modify the build_waypoints() method to include a check for goal proximity within 1.5m, adding those goals as waypoints directly."}
+{"cycle": 334, "lesson": "Adjust the obstacle avoidance strategy to handle dense regions better, possibly by increasing the angular steering factor when obstacles are detected within 0.5m."}
+{"cycle": 335, "lesson": "Reduce the `distance_to` threshold for waypoint and goal completion from 1.5 meters to 0.5 meters to ensure goals are actually reached."}
+{"cycle": 335, "lesson": "Modify the waypoint logic to avoid adding redundant waypoints near goals by checking if a goal is already included in the waypoint list."}
+{"cycle": 335, "lesson": "Increase the stuck counter threshold from 15 to 30 to avoid frequent unnecessary transitions to 'RECOVER' state."}
+{"cycle": 336, "lesson": "Reduce the waypoint reach threshold from 1.0m to 0.5m to ensure goals are marked as visited when the robot is near them."}
+{"cycle": 336, "lesson": "Reorder waypoints in the `build_waypoints` method to include goals directly in the path, such as inserting goal (5,5) between waypoints at y=4 and y=5, and goal (-8,7) between waypoints at y=6 and y=7."}
+{"cycle": 336, "lesson": "Decrease the `stuck_counter` threshold from 15 to 10 to allow faster recovery actions when the robot is stuck."}
+{"cycle": 337, "lesson": "Modify the 'build_waypoints' function to include all goals as mandatory waypoints, regardless of their proximity to the current row, ensuring goals are visited."}
+{"cycle": 337, "lesson": "Reduce the precision of waypoint reaching from 1.0m to 0.5m in the 'distance_to' check to improve coverage efficiency by minimizing time spent aligning precisely with waypoints."}
+{"cycle": 338, "lesson": "Increase the waypoint reach threshold from 0.5m to 1.0m to reduce unnecessary precision and improve coverage."}
+{"cycle": 338, "lesson": "Adjust the obstacle avoidance threshold from 0.5m to 0.3m to allow more forward movement and reduce unnecessary avoidance maneuvers."}
+{"cycle": 338, "lesson": "Increase the stuck_counter threshold from 10 to 20 to reduce premature transitions to 'RECOVER' state, allowing more time for normal navigation."}
+{"cycle": 339, "lesson": "Modify 'build_waypoints' to insert goal (5,5) as a waypoint between row y=4 and y=5, and goal (-8,7) between row y=6 and y=7, ensuring goals are visited during coverage without detours."}
+{"cycle": 339, "lesson": "Increase the timeout threshold from 290 seconds to 350 seconds to allow more time for coverage and goal achievement."}
+{"cycle": 339, "lesson": "Adjust the waypoint reach threshold from 1.0m to 0.5m to ensure more precise navigation towards goals."}
+{"cycle": 340, "lesson": "Reduce the goal proximity threshold in 'distance_to' from 0.8 to 0.5 to ensure goals are registered as visited when within a reasonable distance."}
+{"cycle": 340, "lesson": "Optimize the waypoint insertion logic by ensuring each goal is only inserted once, directly at its location, to avoid redundant detours."}
+{"cycle": 340, "lesson": "Revise the recovery logic to include a more aggressive movement strategy, such as increasing linear speed to 0.5 during recovery, to escape potential local minima more effectively."}
+{"cycle": 341, "lesson": "Integrate goal prioritization by inserting goal waypoints directly into the `build_waypoints()` list when within 1.5m of a row, ensuring goals are visited during coverage."}
+{"cycle": 341, "lesson": "Reduce the number of waypoints by increasing the distance between them to 2m, allowing more time for goal pursuit and reducing unnecessary precision."}
+{"cycle": 341, "lesson": "Implement a dynamic waypoint adjustment strategy that re-evaluates nearby goals every 10 seconds to ensure goals are prioritized without deviating significantly from the coverage path."}
+{"cycle": 342, "lesson": "Modify the waypoint order to prioritize visiting goals by inserting goal (5,5) before row y=5 and goal (-8,7) before row y=7."}
+{"cycle": 342, "lesson": "Increase the timeout threshold to 350 seconds to allow more time for goal visits."}
+{"cycle": 342, "lesson": "Adjust the waypoint reach threshold from 1.0m to 0.5m for better precision in goal proximity detection."}

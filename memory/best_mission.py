@@ -16,15 +16,18 @@ class LawnMowerMission(BaseMission):
         wps = []
         goals = [(5, 5), (-5, -5), (7, -7), (-8, 7), (0, -3)]
         for row, y in enumerate(range(-9, 10)):
+            # Insert nearby goal before this row
             for gx, gy in goals:
                 if abs(gy - y) < 1.5:
                     wps.append((gx, gy))
+            # Row endpoints only
             if row % 2 == 0:
                 wps.append((-9.0, float(y)))
                 wps.append((9.0, float(y)))
             else:
                 wps.append((9.0, float(y)))
                 wps.append((-9.0, float(y)))
+        # Perimeter sweep
         wps.extend([(9, 9), (-9, 9), (-9, -9), (9, -9)])
         return wps
 
@@ -56,7 +59,7 @@ class LawnMowerMission(BaseMission):
         else:
             self.stuck_counter = 0
 
-        if self.stuck_counter > 15:
+        if self.stuck_counter > 20:
             self.state = 'RECOVER'
 
         if obstacles["front"] < 0.3:
