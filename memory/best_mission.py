@@ -13,7 +13,7 @@ class LawnMowerMission(BaseMission):
         self.waypoints = self.build_waypoints()
 
     def build_waypoints(self):
-        wps = []
+        wps = [(5, 5), (-5, -5), (7, -7), (-8, 7), (0, -3)]  # Goals as initial waypoints
         goals = [(5, 5), (-5, -5), (7, -7), (-8, 7), (0, -3)]
         for row, y in enumerate(range(-9, 10)):
             for gx, gy in goals:
@@ -56,7 +56,7 @@ class LawnMowerMission(BaseMission):
         else:
             self.stuck_counter = 0
 
-        if self.stuck_counter > 5:
+        if self.stuck_counter > 10:
             self.state = 'RECOVER'
 
         if obstacles["front"] < 0.3:
