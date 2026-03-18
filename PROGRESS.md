@@ -21,6 +21,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 | 110 | **74.1** | 312 | 297.0m | 0 | 0 |
 | 124 | **74.2** | 313 | 312.1m | 0 | 0 |
 | 170 | **74.5** | 315 | 284.2m | 0 | 0 |
+| 300 | **78.5** | 343 | 345.0m | 0 | 0 |
 
 ## What the Robot is Learning
 
@@ -38,6 +39,7 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 
 
 
+
 #
 #
 #
@@ -52,23 +54,24 @@ Autonomous learning log. The robot iterates on its own mission code to maximize 
 #
 #
 #
-### Cycle 170 (Score: 74.5)
+#
+### Cycle 300 (Score: 78.5)
 
 **What worked:**
-- The robot had 0 collisions, achieving a 100 collision score.
-- The robot maintained high efficiency with a 100 efficiency score.
+- Achieved 98% coverage of the arena, visiting 343 out of 350 cells.
+- No collisions occurred during the mission, indicating effective obstacle avoidance.
 
 **What didn't work:**
-- The robot timed out without visiting any goals, achieving 0.0 goals score.
-- The robot visited 315 cells but did not complete the mission, resulting in only 30 completion score.
+- No goals were visited despite being in close proximity during coverage.
+- The mission timed out at 302.05 seconds without visiting any goals.
 
 **Root causes:**
-- The `build_waypoints` method appends goals as initial waypoints but does not prioritize them effectively during execution.
-- The `distance_to` threshold of 1.0m for waypoint completion is too large, causing imprecise goal visits.
+- The waypoint generation logic in 'build_waypoints' does not prioritize goals effectively, as goals are only added if they are within 1.5m of the current row.
+- The 'distance_to' function's threshold of 0.8m for marking goals as visited is too small, given that goals were not registered as visited.
 
 **Lessons learned:**
-- Reduce the waypoint reach threshold from 1.0m to 0.5m to ensure precise goal visitation.
-- Re-order waypoints to prioritize goal locations: insert goal (5,5) between y=-9 and y=-8, and goal (-8,7) between y=6 and y=7.
-- Modify the `execute` method to dynamically re-evaluate and adjust waypoints based on proximity to goals within 1.5m.
+- Increase the goal proximity threshold in 'distance_to' from 0.8m to 1.5m to ensure goals are marked as visited when in close proximity.
+- Modify 'build_waypoints' to ensure goals are inserted as waypoints at specific intervals, such as between row y=4 and y=5 for goal (5,5), and between row y=6 and y=7 for goal (-8,7).
+- Adjust the timeout condition to allow for more time to complete the mission, as the current time limit of 290 seconds before timeout is too restrictive given the coverage achieved.
 
-**Cells covered: 315/350** (90% of arena)
+**Cells covered: 343/350** (98% of arena)
